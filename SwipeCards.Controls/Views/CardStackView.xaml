@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="SwipeCards.Controls.CardStackView"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Padding="20">
+
+    <Grid>
+        <RelativeLayout x:Name="CardStack" />
+
+        <!--
+            HACK: The TouchObserber is a terrible hack, so let me explain the problem
+            On Android, Child elements obserb touch events and don't pass them to the sender.
+            So when attaching the PanGestureRecognizer to the parent view, it won't fire, when dragging the child.
+            To fix this temporary, I added this transparent view on top of all others and attach the PanGestureRecognizer to it.
+            A custom view renderer with an "IgnoreTouch" property might be a smarter solution...
+        -->
+        <BoxView x:Name="TouchObserber" BackgroundColor="Transparent" />
+    </Grid>
+
+</ContentView>

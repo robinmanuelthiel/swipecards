@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SwipeCards.Demo.Forms.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:SwipeCards.Demo.Forms"
+    xmlns:controls="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls"
+    Title="SwipeCards"
+	BackgroundColor="#EEEEEE">
+
+    <controls:CardStackView x:Name="CardStackView" Margin="20" />
+
+</ContentPage>
