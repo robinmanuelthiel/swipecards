@@ -9,7 +9,19 @@ namespace SwipeCards.Controls
 {
     public partial class CardStackView : ContentView
     {
-        public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(CardStackView), null, propertyChanged: (bindable, oldValue, newValue) => ((CardStackView)bindable).Setup());
+        public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(CardStackView), null, BindingMode.TwoWay,
+            propertyChanged: OnItemsSourcePropertyChanged);
+
+        private static void OnItemsSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((CardStackView)bindable).Setup();
+        }
+
+        void OnItemsSourcePropertyChanged(IList oldValue, IList newValue)
+        {
+            Setup();
+        }
+
         public IList ItemsSource
         {
             get { return (IList)GetValue(ItemsSourceProperty); }
@@ -159,16 +171,13 @@ namespace SwipeCards.Controls
                 // Fire events
                 if (cardDistance > 0)
                 {
-                    if (SwipedRight != null)
-                        //SwipedRight(topCard.Item);
-                        SwipedRight(ItemsSource[itemIndex]);
+                    SwipedRight?.Invoke(ItemsSource[itemIndex]);
                     if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[itemIndex]))
                         SwipedRightCommand.Execute(ItemsSource[itemIndex]);
                 }
                 else
                 {
-                    if (SwipedLeft != null)
-                        SwipedLeft(ItemsSource[itemIndex]);
+                    SwipedLeft?.Invoke(ItemsSource[itemIndex]);
                     if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[itemIndex]))
                         SwipedLeftCommand.Execute(ItemsSource[itemIndex]);
                 }
