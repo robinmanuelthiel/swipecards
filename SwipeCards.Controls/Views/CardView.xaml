@@ -6,6 +6,6 @@
     xmlns:effects="clr-namespace:SwipeCards.Demo.Forms.Effects">
 
     <Frame BackgroundColor="White" HasShadow="False">
-        <Label x:Name="TextLabel" Text="{Binding CardView.Item.Text}" />
+        <ContentView x:Name="Container" />
     </Frame>
 </ContentView>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
-using SwipeCards.Controls.Models;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -15,6 +14,13 @@ namespace SwipeCards.Controls
         {
             get { return (IList)GetValue(ItemsSourceProperty); }
             set { SetValue(ItemsSourceProperty, value); }
+        }
+
+        public static readonly BindableProperty ItemTemplateProperty = BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(CardStackView), null, propertyChanged: (bindable, oldValue, newValue) => ((CardStackView)bindable).Setup());
+        public DataTemplate ItemTemplate
+        {
+            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
+            set { SetValue(ItemTemplateProperty, value); }
         }
 
         public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), 0);
@@ -56,12 +62,20 @@ namespace SwipeCards.Controls
         {
             InitializeComponent();
 
+            // Register pan gesture
+            var panGesture = new PanGestureRecognizer();
+            panGesture.PanUpdated += OnPanUpdated;
+            TouchObserber.GestureRecognizers.Add(panGesture);
+        }
+
+        private void Setup()
+        {
             // Add two cards to stack
             // Use inverse direction to ensure that first card is on top
             for (var i = numberOfCards - 1; i >= 0; i--)
             {
                 // Create CardView
-                var cardView = new CardView(i);
+                var cardView = new CardView(ItemTemplate);
                 cardView.IsVisible = false;
                 cardViews[i] = cardView;
                 cardView.IsEnabled = false;
@@ -76,10 +90,8 @@ namespace SwipeCards.Controls
                 );
             }
 
-            // Register pan gesture
-            var panGesture = new PanGestureRecognizer();
-            panGesture.PanUpdated += OnPanUpdated;
-            TouchObserber.GestureRecognizers.Add(panGesture);
+            itemIndex = 0;
+            ShowNextCard();
         }
 
         async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
@@ -96,12 +108,6 @@ namespace SwipeCards.Controls
                     await HandleTouchCompleted();
                     break;
             }
-        }
-
-        private void Setup()
-        {
-            itemIndex = 0;
-            ShowNextCard();
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -154,16 +160,17 @@ namespace SwipeCards.Controls
                 if (cardDistance > 0)
                 {
                     if (SwipedRight != null)
-                        SwipedRight(topCard.Item);
-                    if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(topCard.Item))
-                        SwipedRightCommand.Execute(topCard.Item);
+                        //SwipedRight(topCard.Item);
+                        SwipedRight(ItemsSource[itemIndex]);
+                    if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[itemIndex]))
+                        SwipedRightCommand.Execute(ItemsSource[itemIndex]);
                 }
                 else
                 {
                     if (SwipedLeft != null)
-                        SwipedLeft(topCard.Item);
-                    if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(topCard.Item))
-                        SwipedLeftCommand.Execute(topCard.Item);
+                        SwipedLeft(ItemsSource[itemIndex]);
+                    if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[itemIndex]))
+                        SwipedLeftCommand.Execute(ItemsSource[itemIndex]);
                 }
 
                 // Next card
@@ -185,6 +192,9 @@ namespace SwipeCards.Controls
 
         private void ShowNextCard()
         {
+            if (ItemsSource == null)
+                return;
+
             for (int i = 0; i < Math.Min(numberOfCards, ItemsSource.Count); i++)
             {
                 var cardView = cardViews[i];
@@ -196,9 +206,7 @@ namespace SwipeCards.Controls
                 // Check if next item is available
                 if (itemIndex + i < ItemsSource.Count)
                 {
-                    cardView.Item = ItemsSource[itemIndex + i];
-                    cardView.UpdateUi();
-
+                    cardView.Update(ItemsSource[itemIndex + i]);
                     cardView.IsVisible = true;
                 }
             }

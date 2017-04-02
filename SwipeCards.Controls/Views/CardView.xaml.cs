@@ -8,21 +8,15 @@ namespace SwipeCards.Controls
 {
     public partial class CardView : ContentView
     {
-        public object item;
-        public object Item
-        {
-            get { return item; }
-            set { item = value; OnPropertyChanged(); }
-        }
-
-        public CardView(int i)
+        public CardView(DataTemplate itemTemplate)
         {
             InitializeComponent();
+            Container.Content = itemTemplate.CreateContent() as View;
         }
 
-        public void UpdateUi()
+        public void Update(object item)
         {
-            TextLabel.Text = (string)item;
+            Container.Content.BindingContext = item;
         }
     }
 }
