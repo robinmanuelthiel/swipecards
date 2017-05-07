@@ -4,6 +4,8 @@ using Xamarin.Forms;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace SwipeCards.Controls
 {
@@ -80,7 +82,7 @@ namespace SwipeCards.Controls
             TouchObserber.GestureRecognizers.Add(panGesture);
         }
 
-        private void Setup()
+        public void Setup()
         {
             // Add two cards to stack
             // Use inverse direction to ensure that first card is on top
@@ -103,6 +105,7 @@ namespace SwipeCards.Controls
             }
 
             itemIndex = 0;
+
             ShowNextCard();
         }
 
