@@ -92,6 +92,7 @@ namespace SwipeCards.Controls
                 var cardView = new CardView(ItemTemplate);
                 cardView.IsVisible = false;
                 cardViews[i] = cardView;
+                cardView.Scale = (i == 0) ? 1.0f : defaultSubcardScale;
                 cardView.IsEnabled = false;
 
                 // Add CardView to UI
@@ -191,6 +192,14 @@ namespace SwipeCards.Controls
             }
             else
             {
+                //// Move card back to the center
+                //await topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut);
+                //await topCard.RotateTo(0, animationLength, Easing.SpringOut);
+
+                //// Scale the back card down
+                //await backCard.ScaleTo(defaultSubcardScale, animationLength, Easing.SpringOut);
+
+
                 // Move card back to the center
                 var traslateAnmimation = topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut);
                 var rotateAnimation = topCard.RotateTo(0, animationLength, Easing.SpringOut);
