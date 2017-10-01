@@ -16,7 +16,9 @@ namespace SwipeCards.Controls
 
         public void Update(object item)
         {
+            //Container.IsVisible = false;
             Container.Content.BindingContext = item;
+            //Container.IsVisible = true;
         }
     }
 }

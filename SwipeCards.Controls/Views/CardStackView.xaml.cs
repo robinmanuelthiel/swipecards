@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Xamarin.Forms.Internals;
 
 namespace SwipeCards.Controls
 {
@@ -21,7 +22,7 @@ namespace SwipeCards.Controls
                 BindingMode.TwoWay,
                 propertyChanged: OnItemsSourcePropertyChanged);
 
-
+        private static NotifyCollectionChangedEventHandler CollectionChangedEventHandler;
         private static void OnItemsSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
             // (Re-)subscribe to source changes
@@ -29,8 +30,14 @@ namespace SwipeCards.Controls
             {
                 // If ItemSource is INotifyCollectionChanged, it can notify us about collection changes
                 // In this case, we can use this, as a trigger for Setup()
-                //TODO: Unsubscibe before
-                ((INotifyCollectionChanged)newValue).CollectionChanged += (sender, e) => ItemsSource_CollectionChanged(sender, e, (CardStackView)bindable);
+
+                // Unsubscibe before
+                if (CollectionChangedEventHandler != null)
+                    ((INotifyCollectionChanged)newValue).CollectionChanged -= CollectionChangedEventHandler;
+
+                // Subscribe event handler
+                CollectionChangedEventHandler = (sender, e) => ItemsSource_CollectionChanged(sender, e, (CardStackView)bindable);
+                ((INotifyCollectionChanged)newValue).CollectionChanged += CollectionChangedEventHandler;
             }
             else
             {
@@ -76,7 +83,14 @@ namespace SwipeCards.Controls
 
         #endregion
 
+        #region Misc Properties
+
         public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), 0);
+
+        /// <summary>
+        /// Distance, that a card has to be dragged into one direction to trigger the flip
+        /// </summary>
+        /// <value>The card move distance.</value>
         public int CardMoveDistance
         {
             get { return (int)GetValue(CardMoveDistanceProperty); }
@@ -97,7 +111,8 @@ namespace SwipeCards.Controls
             set { SetValue(SwipedLeftCommandProperty, value); }
         }
 
-        // Called when a card is swiped left/right
+        #endregion
+
         public Action<object> SwipedRight = null;
         public Action<object> SwipedLeft = null;
         public Action<object> StartedDragging = null;
@@ -105,8 +120,6 @@ namespace SwipeCards.Controls
 
         private const int numberOfCards = 2;
         private const int animationLength = 250;
-
-        private CardView[] cardViews = new CardView[numberOfCards];
         private float defaultSubcardScale = 0.8f;
         private float cardDistance = 0;
         private int itemIndex = 0;
@@ -126,16 +139,16 @@ namespace SwipeCards.Controls
             // TODO: Reduce Setup() calls
             // When starting the app, Setup() gets called multiple times (OnItemsSourcePropertyChanged, OnItemTemplatePropertyChanged, ...). Try to reduce that to 1
 
+            // Reset CardStack first
             CardStack.Children.Clear();
 
-            // Add two cards to stack
+            // Add two cards (one for the front, one for the background) to the stack
             // Use inverse direction to ensure that first card is on top
             for (var i = numberOfCards - 1; i >= 0; i--)
             {
                 // Create CardView
                 var cardView = new CardView(ItemTemplate);
                 cardView.IsVisible = false;
-                cardViews[i] = cardView;
                 cardView.Scale = (i == 0) ? 1.0f : defaultSubcardScale;
                 cardView.IsEnabled = false;
 
@@ -154,6 +167,16 @@ namespace SwipeCards.Controls
             ShowNextCard();
         }
 
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
+
+            // Recalculate move distance
+            // TODO: Check if CardMoveDistance hasn't been set to an individual valu by the developer
+            CardMoveDistance = (int)(width / 3);
+        }
+
         async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
         {
             switch (e.StatusType)
@@ -170,23 +193,19 @@ namespace SwipeCards.Controls
             }
         }
 
-        protected override void OnSizeAllocated(double width, double height)
-        {
-            base.OnSizeAllocated(width, height);
-
-            // Recalculate move distance
-            CardMoveDistance = (int)(width / 3);
-        }
-
         private void HandleTouchStart()
         {
-            StartedDragging?.Invoke(ItemsSource[itemIndex]);
+            if (itemIndex < ItemsSource.Count)
+                StartedDragging?.Invoke(ItemsSource[itemIndex]);
         }
 
         private void HandleTouchRunning(float xDiff)
         {
-            var topCard = cardViews[0];
-            var backCard = cardViews[1];
+            if (itemIndex >= ItemsSource.Count)
+                return;
+
+            var topCard = CardStack.Children[numberOfCards - 1];
+            var backCard = CardStack.Children[numberOfCards - 2];
 
             // Move the top card
             if (topCard.IsVisible)
@@ -211,8 +230,11 @@ namespace SwipeCards.Controls
 
         private async Task HandleTouchCompleted()
         {
-            var topCard = cardViews[0];
-            var backCard = cardViews[1];
+            if (itemIndex >= ItemsSource.Count)
+                return;
+
+            var topCard = CardStack.Children[numberOfCards - 1];
+            var backCard = CardStack.Children[numberOfCards - 2];
 
             // Check if card has been dragged far enough to trigger action
             if (Math.Abs(cardDistance) >= CardMoveDistance)
@@ -241,14 +263,6 @@ namespace SwipeCards.Controls
             }
             else
             {
-                //// Move card back to the center
-                //await topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut);
-                //await topCard.RotateTo(0, animationLength, Easing.SpringOut);
-
-                //// Scale the back card down
-                //await backCard.ScaleTo(defaultSubcardScale, animationLength, Easing.SpringOut);
-
-
                 // Move card back to the center
                 var traslateAnmimation = topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut);
                 var rotateAnimation = topCard.RotateTo(0, animationLength, Easing.SpringOut);
@@ -256,29 +270,43 @@ namespace SwipeCards.Controls
                 // Scale the back card down
                 var scaleAnimation = backCard.ScaleTo(defaultSubcardScale, animationLength, Easing.SpringOut);
 
+                // Run all animations from above simultaneiously
                 await Task.WhenAll(new List<Task> { traslateAnmimation, rotateAnimation, scaleAnimation });
             }
 
-            FinishedDragging?.Invoke(ItemsSource[itemIndex]);
+            if (itemIndex < ItemsSource.Count)
+                FinishedDragging?.Invoke(ItemsSource[itemIndex]);
         }
 
         private void ShowNextCard()
         {
-            if (ItemsSource == null)
+            if (ItemsSource == null || ItemsSource?.Count == 0)
                 return;
 
+            var topCard = CardStack.Children[numberOfCards - 1];
+            var backCard = CardStack.Children[numberOfCards - 2];
+
+            // Switch cards if this method has been called after a swipe and not at init
+            if (itemIndex != 0)
+            {
+                // Remove swiped-away card (topcard) from stack
+                CardStack.Children.Remove(topCard);
+
+                // Scale swiped-away card (topcard) down and add it at the bottom of the stack
+                topCard.Scale = defaultSubcardScale;
+                CardStack.Children.Insert(0, topCard);
+            }
+
+            // Update cards
             for (int i = 0; i < Math.Min(numberOfCards, ItemsSource.Count); i++)
             {
-                var cardView = cardViews[i];
-                cardView.IsVisible = false;
-                cardView.Scale = (i == 0) ? 1.0f : defaultSubcardScale;
+                var cardView = (CardView)CardStack.Children[i];
                 cardView.Rotation = 0;
                 cardView.TranslationX = 0;
 
-                // Check if next item is available
-                if (itemIndex + i < ItemsSource.Count)
+                if ((itemIndex + 1) - i < ItemsSource.Count)
                 {
-                    cardView.Update(ItemsSource[itemIndex + i]);
+                    cardView.Update(ItemsSource[(itemIndex + 1) - i]);
                     cardView.IsVisible = true;
                 }
             }
