@@ -100,6 +100,8 @@ namespace SwipeCards.Controls
         // Called when a card is swiped left/right
         public Action<object> SwipedRight = null;
         public Action<object> SwipedLeft = null;
+        public Action<object> StartedDragging = null;
+        public Action<object> FinishedDragging = null;
 
         private const int numberOfCards = 2;
         private const int animationLength = 250;
@@ -157,7 +159,7 @@ namespace SwipeCards.Controls
             switch (e.StatusType)
             {
                 case GestureStatus.Started:
-                    //HandleTouchStart();
+                    HandleTouchStart();
                     break;
                 case GestureStatus.Running:
                     HandleTouchRunning((float)e.TotalX);
@@ -174,6 +176,11 @@ namespace SwipeCards.Controls
 
             // Recalculate move distance
             CardMoveDistance = (int)(width / 3);
+        }
+
+        private void HandleTouchStart()
+        {
+            StartedDragging?.Invoke(ItemsSource[itemIndex]);
         }
 
         private void HandleTouchRunning(float xDiff)
@@ -251,6 +258,8 @@ namespace SwipeCards.Controls
 
                 await Task.WhenAll(new List<Task> { traslateAnmimation, rotateAnimation, scaleAnimation });
             }
+
+            FinishedDragging?.Invoke(ItemsSource[itemIndex]);
         }
 
         private void ShowNextCard()
