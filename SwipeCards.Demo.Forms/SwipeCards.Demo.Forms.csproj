@@ -55,7 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SwipeCards.Controls\SwipeCards.Controls.csproj">
-      <Project>{73CC4C24-1BD0-49E3-AE34-360D404B8BA0}</Project>
+      <Project>{619E63BE-B7F5-4D2E-9C30-52D8E5E64875}</Project>
       <Name>SwipeCards.Controls</Name>
     </ProjectReference>
   </ItemGroup>

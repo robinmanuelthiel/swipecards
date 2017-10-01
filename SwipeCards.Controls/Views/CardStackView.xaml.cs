@@ -11,17 +11,38 @@ namespace SwipeCards.Controls
 {
     public partial class CardStackView : ContentView
     {
-        public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(CardStackView), null, BindingMode.TwoWay,
-            propertyChanged: OnItemsSourcePropertyChanged);
+        #region ItemsSource Property
+
+        public static readonly BindableProperty ItemsSourceProperty =
+            BindableProperty.Create(
+                nameof(ItemsSource), typeof(IList),
+                typeof(CardStackView),
+                null,
+                BindingMode.TwoWay,
+                propertyChanged: OnItemsSourcePropertyChanged);
+
 
         private static void OnItemsSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((CardStackView)bindable).Setup();
+            // (Re-)subscribe to source changes
+            if (newValue is INotifyCollectionChanged)
+            {
+                // If ItemSource is INotifyCollectionChanged, it can notify us about collection changes
+                // In this case, we can use this, as a trigger for Setup()
+                //TODO: Unsubscibe before
+                ((INotifyCollectionChanged)newValue).CollectionChanged += (sender, e) => ItemsSource_CollectionChanged(sender, e, (CardStackView)bindable);
+            }
+            else
+            {
+                // If ItemsSource is nnot INotifyCollectionChanged, we need to 
+                // call Setup() whenever the whole collection changes
+                ((CardStackView)bindable).Setup();
+            }
         }
 
-        void OnItemsSourcePropertyChanged(IList oldValue, IList newValue)
+        static void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e, CardStackView cardStackView)
         {
-            Setup();
+            cardStackView.Setup();
         }
 
         public IList ItemsSource
@@ -30,12 +51,30 @@ namespace SwipeCards.Controls
             set { SetValue(ItemsSourceProperty, value); }
         }
 
-        public static readonly BindableProperty ItemTemplateProperty = BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(CardStackView), null, propertyChanged: (bindable, oldValue, newValue) => ((CardStackView)bindable).Setup());
+        #endregion
+
+        #region ItemTemplate Property
+
+        public static readonly BindableProperty ItemTemplateProperty =
+            BindableProperty.Create(
+                nameof(ItemTemplate),
+                typeof(DataTemplate),
+                typeof(CardStackView),
+                null,
+                propertyChanged: OnItemTemplatePropertyChanged);
+
+        private static void OnItemTemplatePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            ((CardStackView)bindable).Setup();
+        }
+
         public DataTemplate ItemTemplate
         {
             get { return (DataTemplate)GetValue(ItemTemplateProperty); }
             set { SetValue(ItemTemplateProperty, value); }
         }
+
+        #endregion
 
         public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), 0);
         public int CardMoveDistance
@@ -62,8 +101,6 @@ namespace SwipeCards.Controls
         public Action<object> SwipedRight = null;
         public Action<object> SwipedLeft = null;
 
-
-
         private const int numberOfCards = 2;
         private const int animationLength = 250;
 
@@ -84,6 +121,11 @@ namespace SwipeCards.Controls
 
         public void Setup()
         {
+            // TODO: Reduce Setup() calls
+            // When starting the app, Setup() gets called multiple times (OnItemsSourcePropertyChanged, OnItemTemplatePropertyChanged, ...). Try to reduce that to 1
+
+            CardStack.Children.Clear();
+
             // Add two cards to stack
             // Use inverse direction to ensure that first card is on top
             for (var i = numberOfCards - 1; i >= 0; i--)
