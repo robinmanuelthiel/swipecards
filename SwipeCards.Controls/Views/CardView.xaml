@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:effects="clr-namespace:SwipeCards.Demo.Forms.Effects">
 
-    <Frame BackgroundColor="White" HasShadow="False">
+    <Frame BackgroundColor="White" HasShadow="false">
         <ContentView x:Name="Container" />
     </Frame>
 </ContentView>

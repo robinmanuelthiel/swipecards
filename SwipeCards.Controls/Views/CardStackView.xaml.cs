@@ -188,7 +188,10 @@ namespace SwipeCards.Controls
                     HandleTouchRunning((float)e.TotalX);
                     break;
                 case GestureStatus.Completed:
+                case GestureStatus.Canceled:
                     await HandleTouchCompleted();
+                    break;
+                default:
                     break;
             }
         }
