@@ -1,6 +1,6 @@
+# Swipecards - A Tinder control for Xamarin.Forms
 
-
-# ![Logo](/Design/Logo-50.png) Swipecards - A Tinder control for Xamarin.Forms
+![Preview](/Design/Swipecards.gif)
 
 ## How to use
 **Add the XML namespace**
