@@ -1,6 +1,6 @@
 > **Work in progress - not ready for productive use!**
 
-![Logo](/Design/Logo-150.png)
+![Logo](/Design/Logo-100.png)
 
 # Swipecards - A Tinder control for Xamarin.Forms
 
