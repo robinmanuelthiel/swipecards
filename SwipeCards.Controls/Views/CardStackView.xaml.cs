@@ -39,12 +39,10 @@ namespace SwipeCards.Controls
                 CollectionChangedEventHandler = (sender, e) => ItemsSource_CollectionChanged(sender, e, (CardStackView)bindable);
                 ((INotifyCollectionChanged)newValue).CollectionChanged += CollectionChangedEventHandler;
             }
-            else
-            {
-                // If ItemsSource is nnot INotifyCollectionChanged, we need to 
-                // call Setup() whenever the whole collection changes
-                ((CardStackView)bindable).Setup();
-            }
+
+            // Even if ItemsSource is not INotifyCollectionChanged, we need to 
+            // call Setup() whenever the whole collection changes
+            ((CardStackView)bindable).Setup();
         }
 
         static void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e, CardStackView cardStackView)
@@ -188,7 +186,7 @@ namespace SwipeCards.Controls
                     HandleTouchRunning((float)e.TotalX);
                     break;
                 case GestureStatus.Completed:
-                case GestureStatus.Canceled:
+                    //case GestureStatus.Canceled:
                     await HandleTouchCompleted();
                     break;
                 default:

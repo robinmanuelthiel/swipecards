@@ -22,12 +22,6 @@ namespace SwipeCards.Demo.Forms.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            // Set Navigation Bar Color for iOS
-            UINavigationBar.Appearance.BarTintColor = UIColor.FromRGB(250, 0, 120);
-            UINavigationBar.Appearance.TintColor = UIColor.White;
-            UINavigationBar.Appearance.TitleTextAttributes = new UIStringAttributes() { ForegroundColor = UIColor.White };
-
-
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
 

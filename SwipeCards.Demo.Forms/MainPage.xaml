@@ -3,17 +3,21 @@
     x:Class="SwipeCards.Demo.Forms.MainPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls"
+    xmlns:swipecards="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls"
     xmlns:local="clr-namespace:SwipeCards.Demo.Forms"
-    Title="SwipeCards"
+    Title="SwipeCards Demo"
     BackgroundColor="#EEEEEE">
 
-    <controls:CardStackView x:Name="CardStackView" Margin="20">
-        <controls:CardStackView.ItemTemplate>
+    <swipecards:CardStackView
+        x:Name="CardStackView"
+        ItemsSource="{Binding Cards}"
+        Margin="20, 60">
+        
+        <swipecards:CardStackView.ItemTemplate>
             <DataTemplate>
-                <Label Text="{Binding}" />
+                <Label Text="{Binding}" VerticalOptions="Center" HorizontalOptions="Center" />
             </DataTemplate>
-        </controls:CardStackView.ItemTemplate>
-    </controls:CardStackView>
-
+        </swipecards:CardStackView.ItemTemplate>
+        
+    </swipecards:CardStackView>
 </ContentPage>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SwipeCards.Demo.Forms.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:swipecards="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls"
+    xmlns:local="clr-namespace:SwipeCards.Demo.Forms"
+    Title="SwipeCards Demo"
+    BackgroundColor="#EEEEEE">
+
+    <swipecards:CardStackView x:Name="CardStackView" Margin="20">
+        <swipecards:CardStackView.ItemTemplate>
+            <DataTemplate>
+                <Label Text="{Binding}" />
+            </DataTemplate>
+        </swipecards:CardStackView.ItemTemplate>
+    </swipecards:CardStackView>
+</ContentPage>

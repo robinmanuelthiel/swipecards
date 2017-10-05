@@ -13,16 +13,7 @@ namespace SwipeCards.Demo.Forms
         public MainPage()
         {
             InitializeComponent();
-
-            var contents = new ObservableCollection<string>
-            {
-                "Card No 1",
-                "Card No 2",
-                "Card No 3",
-                "Card No 4"
-            };
-
-            CardStackView.ItemsSource = contents;
+            BindingContext = new MainViewModel();
         }
     }
 }

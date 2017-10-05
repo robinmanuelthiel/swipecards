@@ -13,7 +13,7 @@ namespace SwipeCards.Demo.Forms
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new SwipeCards.Demo.Forms.MainPage());
+            MainPage = new SwipeCards.Demo.Forms.MainPage();
         }
 
         protected override void OnStart()
