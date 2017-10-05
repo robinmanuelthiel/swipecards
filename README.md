@@ -1,6 +1,5 @@
-# Swipecards - A Tinder control for Xamarin.Forms
-
-![Preview](/Design/Swipecards.gif)
+# Swipecards
+**A Tinder control for Xamarin.Forms**
 
 ## How to use
 **Add the XML namespace**
@@ -21,3 +20,7 @@ xmlns:swipecards="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls
     </swipecards:CardStackView.ItemTemplate>   
 </swipecards:CardStackView>
 ```
+## Preview
+![Preview](/Design/Swipecards.gif)
+
+## API Reference
