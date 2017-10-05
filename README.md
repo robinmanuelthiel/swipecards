@@ -1,8 +1,6 @@
-> **Work in progress - not ready for productive use!**
 
-![Logo](/Design/Logo-100.png)
 
-# Swipecards - A Tinder control for Xamarin.Forms
+# ![Logo](/Design/Logo-50.png) Swipecards - A Tinder control for Xamarin.Forms
 
 ## How to use
 **Add the XML namespace**
