@@ -17,10 +17,10 @@
 			<DependentUpon>*.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="App.xaml.cs">
-			<DependentUpon>App.xaml</DependentUpon>
+			<DependentUpon>*.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="MainPage.xaml.cs">
-			<DependentUpon>MainPage.xaml</DependentUpon>
+			<DependentUpon>*.xaml</DependentUpon>
 		</Compile>
 	</ItemGroup>
 	<ItemGroup>

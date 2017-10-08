@@ -83,7 +83,7 @@ namespace SwipeCards.Controls
 
         #region Misc Properties
 
-        public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), 0);
+        public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), -1);
 
         /// <summary>
         /// Distance, that a card has to be dragged into one direction to trigger the flip
@@ -108,6 +108,13 @@ namespace SwipeCards.Controls
             get { return (ICommand)GetValue(SwipedLeftCommandProperty); }
             set { SetValue(SwipedLeftCommandProperty, value); }
         }
+
+        //public static readonly BindableProperty HasShadowProperty = BindableProperty.Create(nameof(HasShadow), typeof(bool), typeof(CardStackView), false);
+        //public bool HasShadow
+        //{
+        //    get { return (bool)GetValue(HasShadowProperty); }
+        //    set { SetValue(HasShadowProperty, value); }
+        //}
 
         #endregion
 
@@ -171,8 +178,8 @@ namespace SwipeCards.Controls
             base.OnSizeAllocated(width, height);
 
             // Recalculate move distance
-            // TODO: Check if CardMoveDistance hasn't been set to an individual valu by the developer
-            CardMoveDistance = (int)(width / 3);
+            if (CardMoveDistance == -1)
+                CardMoveDistance = (int)(width / 3);
         }
 
         async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
