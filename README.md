@@ -1,6 +1,8 @@
 # Swipecards
 **A Tinder control for Xamarin.Forms**
 
+[![NuGet](https://img.shields.io/nuget/v/Forms.Controls.SwipeCards.svg?label=NuGet&style=flat-square)](https://www.nuget.org/packages/Forms.Controls.SwipeCards/)
+
 ## How to use
 **Add the [NuGet package](https://www.nuget.org/packages/Forms.Controls.SwipeCards/) to the Xamarin.Forms project**
 ```
