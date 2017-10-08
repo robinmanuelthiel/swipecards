@@ -1,5 +1,5 @@
 # Swipecards
-**A Tinder control for Xamarin.Forms**
+A Tinder control for Xamarin.Forms that supports iOS, Android and UWP.
 
 [![NuGet](https://img.shields.io/nuget/v/Forms.Controls.SwipeCards.svg?label=NuGet&style=flat-square)](https://www.nuget.org/packages/Forms.Controls.SwipeCards/)
 
