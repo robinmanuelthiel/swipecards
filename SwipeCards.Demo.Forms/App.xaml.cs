@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 
 using Xamarin.Forms;
+using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
 
 namespace SwipeCards.Demo.Forms
 {
-    public partial class App : Application
+    public partial class App : Xamarin.Forms.Application
     {
         public App()
         {
             InitializeComponent();
 
-            MainPage = new SwipeCards.Demo.Forms.MainPage();
+            MainPage = new TabbedDemoPage();
         }
 
         protected override void OnStart()
