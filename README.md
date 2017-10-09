@@ -1,5 +1,5 @@
 # Swipecards
-**A Tinder control for Xamarin.Forms**
+A Tinder control for Xamarin.Forms that supports iOS, Android and UWP.
 
 [![NuGet](https://img.shields.io/nuget/v/Forms.Controls.SwipeCards.svg?label=NuGet&style=flat-square)](https://www.nuget.org/packages/Forms.Controls.SwipeCards/)
 
@@ -31,3 +31,19 @@ xmlns:swipecards="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls
 ![Preview](/Design/Swipecards.gif)
 
 ## API Reference
+| Property | Default | Description |
+|------------------|---------|-------------|
+| CardMoveDistance | null | How far the card has to be dragged to trigger the swipe. Default is 30% of the control |
+
+| Command | Parameter | Description |
+|------------------|---------|-------------|
+| SwipedLeftCommand | Selected Item | Triggered, when card got swiped to the left |
+| SwipedRightCommand | Selected Item | Triggered, when card got swiped to the right |
+
+| Action | Parameter | Description |
+|------------------|---------|-------------|
+| SwipedLeft | Selected Item | Triggered, when card got swiped to the left |
+| SwipedRight | Selected Item | Triggered, when card got swiped to the right |
+| StartedDragging | Selected Item | Triggered, when card got dragged |
+| FinishedDragging | Selected Item | Triggered, when dragging finished |
+
