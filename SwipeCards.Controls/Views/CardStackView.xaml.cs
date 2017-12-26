@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Xamarin.Forms.Internals;
+using SwipeCards.Controls.Arguments;
 
 namespace SwipeCards.Controls
 {
@@ -118,10 +119,9 @@ namespace SwipeCards.Controls
 
         #endregion
 
-        public Action<object> SwipedRight = null;
-        public Action<object> SwipedLeft = null;
-        public Action<object> StartedDragging = null;
-        public Action<object> FinishedDragging = null;
+        public event EventHandler<SwipedEventArgs> Swiped;
+        public event EventHandler<DraggingEventArgs> StartedDragging;
+        public event EventHandler<DraggingEventArgs> FinishedDragging;
 
         private const int numberOfCards = 2;
         private const int animationLength = 250;
@@ -152,10 +152,12 @@ namespace SwipeCards.Controls
             for (var i = numberOfCards - 1; i >= 0; i--)
             {
                 // Create CardView
-                var cardView = new CardView(ItemTemplate);
-                cardView.IsVisible = false;
-                cardView.Scale = (i == 0) ? 1.0f : defaultSubcardScale;
-                cardView.IsEnabled = false;
+                var cardView = new CardView(ItemTemplate)
+                {
+                    IsVisible = false,
+                    Scale = (i == 0) ? 1.0f : defaultSubcardScale,
+                    IsEnabled = false
+                };
 
                 // Add CardView to UI
                 CardStack.Children.Add(
@@ -172,13 +174,12 @@ namespace SwipeCards.Controls
             ShowNextCard();
         }
 
-
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height);
 
             // Recalculate move distance
-            if (CardMoveDistance == -1)
+            if (CardMoveDistance == -1 && !width.Equals(-1))
                 CardMoveDistance = (int)(width / 3);
         }
 
@@ -204,7 +205,7 @@ namespace SwipeCards.Controls
         private void HandleTouchStart()
         {
             if (itemIndex < ItemsSource.Count)
-                StartedDragging?.Invoke(ItemsSource[itemIndex]);
+                StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[itemIndex]));
         }
 
         private void HandleTouchRunning(float xDiff)
@@ -254,13 +255,13 @@ namespace SwipeCards.Controls
                 // Fire events
                 if (cardDistance > 0)
                 {
-                    SwipedRight?.Invoke(ItemsSource[itemIndex]);
+                    Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[itemIndex], SwipeDirection.Right));
                     if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[itemIndex]))
                         SwipedRightCommand.Execute(ItemsSource[itemIndex]);
                 }
                 else
                 {
-                    SwipedLeft?.Invoke(ItemsSource[itemIndex]);
+                    Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[itemIndex], SwipeDirection.Left));
                     if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[itemIndex]))
                         SwipedLeftCommand.Execute(ItemsSource[itemIndex]);
                 }
@@ -283,7 +284,7 @@ namespace SwipeCards.Controls
             }
 
             if (itemIndex < ItemsSource.Count)
-                FinishedDragging?.Invoke(ItemsSource[itemIndex]);
+                FinishedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[itemIndex]));
         }
 
         private void ShowNextCard()

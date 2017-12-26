@@ -28,6 +28,5 @@ namespace SwipeCards.Demo.Forms
         // Implementation of INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void RaisePropertyChanged([CallerMemberName] string name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
     }
 }

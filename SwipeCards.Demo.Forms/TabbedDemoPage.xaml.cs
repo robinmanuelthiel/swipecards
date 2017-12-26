@@ -11,8 +11,21 @@ namespace SwipeCards.Demo.Forms
         public TabbedDemoPage()
         {
             InitializeComponent();
-            this.On<Xamarin.Forms.PlatformConfiguration.Android>().SetIsSwipePagingEnabled(false);
             BindingContext = new MainViewModel();
+
+            // Disable swiping between tabs on Android, as it collides 
+            // with Sipe Card's gestures
+            this.On<Xamarin.Forms.PlatformConfiguration.Android>().SetIsSwipePagingEnabled(false);
+        }
+
+        void CardStackView_Swiped(object sender, Controls.Arguments.SwipedEventArgs e)
+        {
+
+        }
+
+        void RestartButton_Clicked(object sender, System.EventArgs e)
+        {
+            CardStackView.Setup();
         }
     }
 }

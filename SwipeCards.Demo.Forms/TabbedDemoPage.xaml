@@ -3,24 +3,42 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:swipecards="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls"
-    x:Class="SwipeCards.Demo.Forms.TabbedDemoPage">
+    x:Class="SwipeCards.Demo.Forms.TabbedDemoPage"
+    Title="SwipeCards Demo">
     
     <ContentPage Title="Tab 1" BackgroundColor="#EEEEEE">
-        <swipecards:CardStackView
-            x:Name="CardStackView"
-            ItemsSource="{Binding Cards}"
-            Margin="20, 60">
-            
-            <swipecards:CardStackView.ItemTemplate>
-                <DataTemplate>
-                    <Label Text="{Binding}" VerticalOptions="Center" HorizontalOptions="Center" />
-                </DataTemplate>
-            </swipecards:CardStackView.ItemTemplate>
-            
-        </swipecards:CardStackView>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Card Stack View -->
+            <swipecards:CardStackView
+                x:Name="CardStackView"
+                ItemsSource="{Binding Cards}"
+                Swiped="CardStackView_Swiped"
+                Margin="20">
+                
+                <swipecards:CardStackView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding}" VerticalOptions="Center" HorizontalOptions="Center" />
+                    </DataTemplate>
+                </swipecards:CardStackView.ItemTemplate>            
+            </swipecards:CardStackView>
+
+            <!-- Restart Button -->
+            <Button 
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                Text="Restart"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Clicked="RestartButton_Clicked" />
+        </Grid>
     </ContentPage>
 
-    <ContentPage Title="Tab 2">
+    <ContentPage Title="Tab 2" BackgroundColor="#EEEEEE">
+        <Label Text="Nothing to see here" HorizontalOptions="Center" VerticalOptions="Center" />
     </ContentPage>
-
 </TabbedPage>

@@ -15,7 +15,7 @@
         <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Xamarin.Forms" Version="2.5.0.91635" />
+        <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Views\CardStackView.xaml">
@@ -35,5 +35,6 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Views\" />
+        <Folder Include="Arguments\" />
     </ItemGroup>
 </Project>
