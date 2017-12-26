@@ -28,7 +28,7 @@ xmlns:swipecards="clr-namespace:SwipeCards.Controls;assembly=SwipeCards.Controls
 </swipecards:CardStackView>
 ```
 ## Preview
-Take a look a the Demo Project in this repository for a full sample.
+Take a look a the [Demo Project](/SwipeCards.Demo.Forms) in this repository for a full sample.
 
 ![Preview](/Design/Swipecards.gif)
 
