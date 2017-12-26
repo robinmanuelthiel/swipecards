@@ -12,10 +12,7 @@
         <PackageTags>tinder xamarin.forms control card swipe swipecards</PackageTags>
         <Title>SwipeCards for Xamarin.Forms</Title>
         <PackOnBuild>true</PackOnBuild>
-        <PackageReleaseNotes>- Update to Xamarin.Forms 2.5.0.121934
-- Replaced `SwipedRight` and `SwipedLeft` Actions with `Swipe` Event
-- Replaced `StartedDragging` and `FinishedDragging` Actions with Events
-- Bugfixes</PackageReleaseNotes>
+        <PackageReleaseNotes>Update to Xamarin.Forms 2.5.0.121934, Replace `SwipedRight` and `SwipedLeft` Actions with `Swipe` Event, Replace `StartedDragging` and `FinishedDragging` Actions with Events, Bugfixes</PackageReleaseNotes>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
