@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netstandard1.0</TargetFrameworks>
+        <TargetFrameworks>netstandard1.0;monoandroid403;xamarinios10;uap10.0</TargetFrameworks>
         <PackageId>Forms.Controls.SwipeCards</PackageId>
-        <PackageVersion>0.3.0</PackageVersion>
+        <PackageVersion>0.3.1</PackageVersion>
         <Authors>Robin-Manuel Thiel</Authors>
         <Description>A Tinder-like swipe control for Xamarin.Forms</Description>
         <PackageIconUrl>https://raw.githubusercontent.com/robinmanuelthiel/swipecards/master/Design/Logo-150.png</PackageIconUrl>
@@ -12,9 +12,30 @@
         <PackageTags>tinder xamarin.forms control card swipe swipecards</PackageTags>
         <Title>SwipeCards for Xamarin.Forms</Title>
         <PackOnBuild>true</PackOnBuild>
-        <PackageReleaseNotes>Update to Xamarin.Forms 2.5.0.121934, Replace `SwipedRight` and `SwipedLeft` Actions with `Swipe` Event, Replace `StartedDragging` and `FinishedDragging` Actions with Events, Bugfixes</PackageReleaseNotes>
+        <PackageReleaseNotes>
+        </PackageReleaseNotes>
+    </PropertyGroup>
+    <!-- any extra properties for the .NET Standard build -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
+        <!-- for a pure bait-and-switch library, the .NET Standard output is a reference-only output -->
+        <!--<ProduceReferenceAssembly>True</ProduceReferenceAssembly>-->
+    </PropertyGroup>
+    <!-- any extra properties for the Android build -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'monoandroid403'">
+    </PropertyGroup>
+    <!-- any extra properties for the iOS build -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'xamarinios10'">
+    </PropertyGroup>
+    <!-- any extra properties for the UWP build -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+        <!-- UWP requires a few extra properties, such as versioning -->
+        <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+        <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
+        <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
+        <PackageReference Include="MSBuild.Sdk.Extras" Version="1.1.0" />
     </ItemGroup>
+    <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
