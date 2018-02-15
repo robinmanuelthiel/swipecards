@@ -197,8 +197,6 @@ namespace SwipeCards.Controls
                     //case GestureStatus.Canceled:
                     await HandleTouchCompleted();
                     break;
-                default:
-                    break;
             }
         }
 
@@ -306,16 +304,19 @@ namespace SwipeCards.Controls
                 CardStack.Children.Insert(0, topCard);
             }
 
-            // Update cards
-            for (int i = 0; i < Math.Min(numberOfCards, ItemsSource.Count); i++)
+            // Update cards from top to back
+            // Start with the first card on top with is the last one on the CardStack
+            for (var i = numberOfCards - 1; i >= 0; i--)
             {
                 var cardView = (CardView)CardStack.Children[i];
                 cardView.Rotation = 0;
                 cardView.TranslationX = 0;
 
-                if ((itemIndex + 1) - i < ItemsSource.Count)
+                // Check if an item for the card is available
+                var index = Math.Min((numberOfCards - 1), ItemsSource.Count) - i + itemIndex;
+                if (ItemsSource.Count > index)
                 {
-                    cardView.Update(ItemsSource[(itemIndex + 1) - i]);
+                    cardView.Update(ItemsSource[index]);
                     cardView.IsVisible = true;
                 }
             }
