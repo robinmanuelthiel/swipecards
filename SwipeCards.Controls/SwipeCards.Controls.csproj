@@ -34,8 +34,8 @@
         <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
         <PackageReference Include="MSBuild.Sdk.Extras" Version="1.1.0" />
+        <PackageReference Include="Xamarin.Forms" Version="2.5.0.122203" />
     </ItemGroup>
     <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
