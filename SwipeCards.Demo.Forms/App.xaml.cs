@@ -6,6 +6,7 @@ using System.Text;
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
 
+
 namespace SwipeCards.Demo.Forms
 {
     public partial class App : Xamarin.Forms.Application

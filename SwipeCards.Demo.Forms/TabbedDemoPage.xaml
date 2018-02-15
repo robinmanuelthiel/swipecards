@@ -7,6 +7,12 @@
     Title="SwipeCards Demo">
     
     <ContentPage Title="Tab 1" BackgroundColor="#EEEEEE">
+        <ContentPage.Icon>
+            <OnPlatform x:TypeArguments="FileImageSource">
+                <On Platform="iOS" Value="tab1.png" />
+            </OnPlatform>
+        </ContentPage.Icon>
+        
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -18,8 +24,9 @@
                 x:Name="CardStackView"
                 ItemsSource="{Binding Cards}"
                 Swiped="CardStackView_Swiped"
-                Margin="20">
-                
+                Margin="10">
+
+                <!-- Item template for the card's content -->
                 <swipecards:CardStackView.ItemTemplate>
                     <DataTemplate>
                         <Label Text="{Binding}" VerticalOptions="Center" HorizontalOptions="Center" />
@@ -30,7 +37,7 @@
             <!-- Restart Button -->
             <Button 
                 Grid.Row="1"
-                Margin="0,0,0,20"
+                Margin="0,0,0,10"
                 Text="Restart"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
@@ -39,6 +46,15 @@
     </ContentPage>
 
     <ContentPage Title="Tab 2" BackgroundColor="#EEEEEE">
-        <Label Text="Nothing to see here" HorizontalOptions="Center" VerticalOptions="Center" />
+         <ContentPage.Icon>
+            <OnPlatform x:TypeArguments="FileImageSource">
+                <On Platform="iOS" Value="tab1.png" />
+            </OnPlatform>
+        </ContentPage.Icon>
+        
+        <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Margin="30">
+            <Label Text="Nothing to see here" HorizontalTextAlignment="Center"  />
+            <Label Text="Just testing how the control behaves in Tabbed Layouts" HorizontalTextAlignment="Center" FontSize="Small" />
+        </StackLayout>
     </ContentPage>
 </TabbedPage>

@@ -14,7 +14,7 @@ namespace SwipeCards.Demo.Forms
             BindingContext = new MainViewModel();
 
             // Disable swiping between tabs on Android, as it collides 
-            // with Sipe Card's gestures
+            // with Swipe Card's swipe gestures
             this.On<Xamarin.Forms.PlatformConfiguration.Android>().SetIsSwipePagingEnabled(false);
         }
 
