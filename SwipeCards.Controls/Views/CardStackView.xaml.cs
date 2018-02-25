@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Xamarin.Forms.Internals;
 using SwipeCards.Controls.Arguments;
+using Xamarin.Forms.Xaml;
 
 namespace SwipeCards.Controls
 {
@@ -66,7 +67,12 @@ namespace SwipeCards.Controls
                 nameof(ItemTemplate),
                 typeof(DataTemplate),
                 typeof(CardStackView),
-                null,
+                new DataTemplate(() =>
+                {
+                    var label = new Label { VerticalOptions = LayoutOptions.Center, HorizontalOptions = LayoutOptions.Center };
+                    label.SetBinding(Label.TextProperty, "Binding");
+                    return new ViewCell { View = label };
+                }),
                 propertyChanged: OnItemTemplatePropertyChanged);
 
         private static void OnItemTemplatePropertyChanged(BindableObject bindable, object oldValue, object newValue)
@@ -137,6 +143,8 @@ namespace SwipeCards.Controls
             var panGesture = new PanGestureRecognizer();
             panGesture.PanUpdated += OnPanUpdated;
             TouchObserber.GestureRecognizers.Add(panGesture);
+
+            Setup();
         }
 
         public void Setup()

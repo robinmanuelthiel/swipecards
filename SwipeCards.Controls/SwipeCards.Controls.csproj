@@ -12,8 +12,7 @@
         <PackageTags>tinder xamarin.forms control card swipe swipecards</PackageTags>
         <Title>SwipeCards for Xamarin.Forms</Title>
         <PackOnBuild>true</PackOnBuild>
-        <PackageReleaseNotes>
-        </PackageReleaseNotes>
+        <PackageReleaseNotes>Fixed 'Single card not showing up' bug.</PackageReleaseNotes>
     </PropertyGroup>
     <!-- any extra properties for the .NET Standard build -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
