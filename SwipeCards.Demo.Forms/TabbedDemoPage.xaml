@@ -35,13 +35,11 @@
             </swipecards:CardStackView>
 
             <!-- Restart Button -->
-            <Button 
-                Grid.Row="1"
-                Margin="0,0,0,10"
-                Text="Restart"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                Clicked="RestartButton_Clicked" />
+            <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
+                <Button Text="Swipe Left" Clicked="SwipeLeftButton_Clicked" />
+                <Button Text="Restart" Clicked="RestartButton_Clicked" />
+                <Button Text="Swipe Right" Clicked="SwipeRightButton_Clicked" />
+            </StackLayout>
         </Grid>
     </ContentPage>
 

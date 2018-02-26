@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Xamarin.Forms;
 using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
+using SwipeCards.Controls.Arguments;
 
 namespace SwipeCards.Demo.Forms
 {
@@ -26,6 +27,16 @@ namespace SwipeCards.Demo.Forms
         void RestartButton_Clicked(object sender, System.EventArgs e)
         {
             CardStackView.Setup();
+        }
+
+        void SwipeLeftButton_Clicked(object sender, System.EventArgs e)
+        {
+            CardStackView.Swipe(SwipeDirection.Left);
+        }
+
+        void SwipeRightButton_Clicked(object sender, System.EventArgs e)
+        {
+            CardStackView.Swipe(SwipeDirection.Right);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using Xamarin.Forms.Internals;
 using SwipeCards.Controls.Arguments;
 using Xamarin.Forms.Xaml;
+using System.Reflection;
 
 namespace SwipeCards.Controls
 {
@@ -278,15 +279,15 @@ namespace SwipeCards.Controls
             }
             else
             {
-                // Move card back to the center
-                var traslateAnmimation = topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut);
-                var rotateAnimation = topCard.RotateTo(0, animationLength, Easing.SpringOut);
+                // Run all animations from above simultaniously
+                await Task.WhenAll(
+                    // Move card back to the center
+                    topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut),
+                    topCard.RotateTo(0, animationLength, Easing.SpringOut),
 
-                // Scale the back card down
-                var scaleAnimation = backCard.ScaleTo(defaultSubcardScale, animationLength, Easing.SpringOut);
-
-                // Run all animations from above simultaneiously
-                await Task.WhenAll(new List<Task> { traslateAnmimation, rotateAnimation, scaleAnimation });
+                    // Scale the back card down
+                    backCard.ScaleTo(defaultSubcardScale, animationLength, Easing.SpringOut)
+                );
             }
 
             if (itemIndex < ItemsSource.Count)
@@ -313,7 +314,7 @@ namespace SwipeCards.Controls
             }
 
             // Update cards from top to back
-            // Start with the first card on top with is the last one on the CardStack
+            // Start with the first card on top which is the last one on the CardStack
             for (var i = numberOfCards - 1; i >= 0; i--)
             {
                 var cardView = (CardView)CardStack.Children[i];
@@ -328,6 +329,45 @@ namespace SwipeCards.Controls
                     cardView.IsVisible = true;
                 }
             }
+        }
+
+        public async void Swipe(SwipeDirection direction, uint animationLength = 500)
+        {
+            var topCard = CardStack.Children[numberOfCards - 1];
+            var backCard = CardStack.Children[numberOfCards - 2];
+
+
+            double animationWidth = this.Width * 2;
+            double rotation = 0.3f * 57.2957795f;
+            if (direction == SwipeDirection.Left)
+            {
+                animationWidth *= -1;
+                rotation *= -1;
+            }
+
+            // Run all animations from above simultaniously
+            await Task.WhenAll(
+                topCard.TranslateTo(animationWidth, 0, animationLength * 2, Easing.SpringOut),
+                topCard.RotateTo(rotation, animationLength, Easing.SpringOut),
+                backCard.ScaleTo(1.0f, animationLength)
+            );
+            topCard.IsVisible = false;
+
+            Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[itemIndex], direction));
+            if (direction == SwipeDirection.Left)
+            {
+                if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[itemIndex]))
+                    SwipedLeftCommand.Execute(ItemsSource[itemIndex]);
+            }
+            else if (direction == SwipeDirection.Right)
+            {
+                if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[itemIndex]))
+                    SwipedRightCommand.Execute(ItemsSource[itemIndex]);
+            }
+
+            // Next card
+            itemIndex++;
+            ShowNextCard();
         }
     }
 }
