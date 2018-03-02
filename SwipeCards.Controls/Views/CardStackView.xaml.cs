@@ -131,7 +131,7 @@ namespace SwipeCards.Controls
         public event EventHandler<DraggingEventArgs> FinishedDragging;
 
         private const int numberOfCards = 2;
-        private const int animationLength = 250;
+        private const int defaultAnimationLength = 250;
         private float defaultSubcardScale = 0.8f;
         private float cardDistance = 0;
         private int itemIndex = 0;
@@ -178,8 +178,10 @@ namespace SwipeCards.Controls
                 );
             }
 
+            // Reset item index
             itemIndex = 0;
 
+            // Start displaying card content
             ShowNextCard();
         }
 
@@ -188,9 +190,12 @@ namespace SwipeCards.Controls
             base.OnSizeAllocated(width, height);
 
             // Recalculate move distance
+            // When not set differently, this distance is 1/3 of the control's width
             if (CardMoveDistance == -1 && !width.Equals(-1))
                 CardMoveDistance = (int)(width / 3);
         }
+
+        #region Handle Touch Swiping 
 
         async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
         {
@@ -203,19 +208,20 @@ namespace SwipeCards.Controls
                     HandleTouchRunning((float)e.TotalX);
                     break;
                 case GestureStatus.Completed:
-                    //case GestureStatus.Canceled:
                     await HandleTouchCompleted();
+                    break;
+                case GestureStatus.Canceled:
                     break;
             }
         }
 
-        private void HandleTouchStart()
+        void HandleTouchStart()
         {
             if (itemIndex < ItemsSource.Count)
                 StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[itemIndex]));
         }
 
-        private void HandleTouchRunning(float xDiff)
+        void HandleTouchRunning(float xDiff)
         {
             if (itemIndex >= ItemsSource.Count)
                 return;
@@ -233,18 +239,15 @@ namespace SwipeCards.Controls
                 float rotationAngel = (float)(0.3f * Math.Min(xDiff / this.Width, 1.0f));
                 topCard.Rotation = rotationAngel * 57.2957795f;
 
-                // Keep a record of how far its moved
+                // Keep a record of how far it is moved
                 cardDistance = xDiff;
             }
 
             // Scale the backcard
-            if (backCard.IsVisible)
-            {
-                backCard.Scale = Math.Min(defaultSubcardScale + Math.Abs((cardDistance / CardMoveDistance) * (1.0f - defaultSubcardScale)), 1.0f);
-            }
+            backCard.Scale = Math.Min(defaultSubcardScale + Math.Abs((cardDistance / CardMoveDistance) * (1.0f - defaultSubcardScale)), 1.0f);
         }
 
-        private async Task HandleTouchCompleted()
+        async Task HandleTouchCompleted()
         {
             if (itemIndex >= ItemsSource.Count)
                 return;
@@ -256,7 +259,7 @@ namespace SwipeCards.Controls
             if (Math.Abs(cardDistance) >= CardMoveDistance)
             {
                 // Move card off the screen
-                await topCard.TranslateTo(cardDistance > 0 ? this.Width : -this.Width, 0, animationLength / 2, Easing.SpringOut);
+                await topCard.TranslateTo(cardDistance > 0 ? this.Width * 2 : -this.Width * 2, 0, defaultAnimationLength, Easing.SinIn);
                 topCard.IsVisible = false;
 
                 // Fire events
@@ -279,14 +282,14 @@ namespace SwipeCards.Controls
             }
             else
             {
-                // Run all animations from above simultaniously
+                // Run animations simultaniously
                 await Task.WhenAll(
                     // Move card back to the center
-                    topCard.TranslateTo((-topCard.X), -topCard.Y, animationLength, Easing.SpringOut),
-                    topCard.RotateTo(0, animationLength, Easing.SpringOut),
+                    topCard.TranslateTo((-topCard.X), -topCard.Y, defaultAnimationLength, Easing.SpringOut),
+                    topCard.RotateTo(0, defaultAnimationLength, Easing.SpringOut),
 
                     // Scale the back card down
-                    backCard.ScaleTo(defaultSubcardScale, animationLength, Easing.SpringOut)
+                    backCard.ScaleTo(defaultSubcardScale, defaultAnimationLength, Easing.SpringOut)
                 );
             }
 
@@ -294,7 +297,9 @@ namespace SwipeCards.Controls
                 FinishedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[itemIndex]));
         }
 
-        private void ShowNextCard()
+        #endregion
+
+        void ShowNextCard()
         {
             if (ItemsSource == null || ItemsSource?.Count == 0)
                 return;
@@ -331,28 +336,16 @@ namespace SwipeCards.Controls
             }
         }
 
-        public async void Swipe(SwipeDirection direction, uint animationLength = 500)
+        public async void Swipe(SwipeDirection direction, uint animationLength = defaultAnimationLength)
         {
+            // Check if there is something to swipe
+            if (itemIndex >= ItemsSource?.Count)
+                return;
+
             var topCard = CardStack.Children[numberOfCards - 1];
             var backCard = CardStack.Children[numberOfCards - 2];
 
-
-            double animationWidth = this.Width * 2;
-            double rotation = 0.3f * 57.2957795f;
-            if (direction == SwipeDirection.Left)
-            {
-                animationWidth *= -1;
-                rotation *= -1;
-            }
-
-            // Run all animations from above simultaniously
-            await Task.WhenAll(
-                topCard.TranslateTo(animationWidth, 0, animationLength * 2, Easing.SpringOut),
-                topCard.RotateTo(rotation, animationLength, Easing.SpringOut),
-                backCard.ScaleTo(1.0f, animationLength)
-            );
-            topCard.IsVisible = false;
-
+            // Fire events
             Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[itemIndex], direction));
             if (direction == SwipeDirection.Left)
             {
@@ -365,8 +358,24 @@ namespace SwipeCards.Controls
                     SwipedRightCommand.Execute(ItemsSource[itemIndex]);
             }
 
-            // Next card
+            // Increase item index
+            // Do that before the animation runs
             itemIndex++;
+
+            // Animate card
+            await Task.WhenAll(
+                // Move card left or right
+                topCard.TranslateTo(direction == SwipeDirection.Right ? this.Width * 2 : -this.Width * 2, 0, animationLength, Easing.SinIn),
+
+                // Rotate card (57.2957795f/3=17.18873385f)
+                topCard.RotateTo(direction == SwipeDirection.Right ? 17.18873385f : -17.18873385f, animationLength, Easing.SinIn),
+
+                // Scale back card up
+                backCard.ScaleTo(1.0f, animationLength)
+            );
+            topCard.IsVisible = false;
+
+            // Next card
             ShowNextCard();
         }
     }

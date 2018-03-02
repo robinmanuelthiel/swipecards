@@ -1,13 +1,12 @@
-﻿using System;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
 namespace SwipeCards.Demo.Forms
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<string> cards;
+        ObservableCollection<string> cards;
         public ObservableCollection<string> Cards
         {
             get { return cards; }
@@ -27,6 +26,6 @@ namespace SwipeCards.Demo.Forms
 
         // Implementation of INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChanged([CallerMemberName] string name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        void RaisePropertyChanged([CallerMemberName] string name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
