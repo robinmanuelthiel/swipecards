@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Xamarin.Forms;
 using System.Collections;
 using System.Threading.Tasks;
@@ -65,6 +66,7 @@ namespace SwipeCards
 		public event EventHandler<DraggingEventArgs> StartedDragging;
 		public event EventHandler<DraggingEventArgs> Dragging;
 		public event EventHandler<DraggingEventArgs> FinishedDragging;
+		public event EventHandler<EventArgs> NoMoreCards;
 
 		public CardStackView()
 		{
@@ -266,7 +268,10 @@ namespace SwipeCards
 		public async Task Swipe(SwipeDirection direction, uint animationLength = DefaultAnimationLength)
 		{
 			if (_itemIndex >= ItemsSource?.Count)
+			{
+				NoMoreCards?.Invoke(this, new EventArgs());
 				return;
+			}
 
 			var topCard = CardStack.Children[NumberOfCards - 1];
 			var backCard = CardStack.Children[NumberOfCards - 2];
