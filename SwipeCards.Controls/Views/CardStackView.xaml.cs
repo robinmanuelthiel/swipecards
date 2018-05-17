@@ -274,10 +274,11 @@ namespace SwipeCards
 
 					if (!cardView.IsVisible)
 					{
+						cardView.TranslationX = -cardView.Width + _defaultSubcardTranslationX;
 						cardView.IsVisible = true;
-					}
 
-					//await cardView.TranslateTo(-_defaultSubcardTranslationX * i, 0, DefaultAnimationLength, Easing.SpringOut);
+						cardView.TranslateTo(_defaultSubcardTranslationX * (NumberOfCards - 1 - i), 0, DefaultAnimationLength, Easing.Linear);
+					}
 				}
 			}
 		}
