@@ -5,6 +5,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace SwipeCards
 {
@@ -20,7 +21,9 @@ namespace SwipeCards
 
 		private const int NumberOfCards = 2;
 		private const int DefaultAnimationLength = 250;
-		private float _defaultSubcardScale = 0.8f;
+		private float _defaultSubcardScale = 0.9f;
+		private float _defaultSubcardTranslationX = -30;
+		private float _defaultSubcardOpacity = .6f;
 		private float _cardDistance;
 		private int _itemIndex;
 
@@ -90,7 +93,9 @@ namespace SwipeCards
 				var cardView = new CardView(ItemTemplate)
 				{
 					IsVisible = false,
-					Scale = (i == 0) ? 1.0f : _defaultSubcardScale
+					Scale = (i == 0) ? 1 : _defaultSubcardScale,
+					TranslationX = (i == 0) ? 0 : _defaultSubcardTranslationX,
+					Opacity = (i == 0) ? 0 : _defaultSubcardOpacity
 				};
 
 				CardStack.Children.Add(cardView, Constraint.Constant(0), Constraint.Constant(0), Constraint.RelativeToParent((parent) => { return parent.Width; }),
@@ -166,12 +171,12 @@ namespace SwipeCards
 
 			if (topCard.IsVisible)
 			{
-				topCard.TranslationX = (horizontalTraslation);
+				topCard.TranslationX = horizontalTraslation;
 
 				if (SwipeMode == SwipeMode.Tinder)
 				{
-					var rotationAngel = (float)(0.3f * Math.Min(horizontalTraslation / Width, 1.0f));
-					topCard.Rotation = rotationAngel * 57.2957795f;
+					var rotationAngle = (float)(0.3f * Math.Min(horizontalTraslation / Width, 1.0f));
+					topCard.Rotation = rotationAngle * 57.2957795f;
 				}
 
 				_cardDistance = horizontalTraslation;
@@ -179,7 +184,9 @@ namespace SwipeCards
 				Dragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
 			}
 
-			backCard.Scale = Math.Min(_defaultSubcardScale + Math.Abs((_cardDistance / CardMoveDistance) * (1.0f - _defaultSubcardScale)), 1.0f);
+			backCard.Scale = Math.Min(_defaultSubcardScale + Math.Abs((_cardDistance / CardMoveDistance) * (1 - _defaultSubcardScale)), 1);
+			backCard.TranslationX = Math.Min(_defaultSubcardTranslationX + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardTranslationX), 0);
+			backCard.Opacity = Math.Min(_defaultSubcardOpacity + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardOpacity), 1);
 		}
 
 		private async Task HandleTouchCompleted()
@@ -193,6 +200,7 @@ namespace SwipeCards
 			if (Math.Abs(_cardDistance) >= CardMoveDistance)
 			{
 				await topCard.TranslateTo(_cardDistance > 0 ? Width * 2 : -Width * 2, 0, DefaultAnimationLength, Easing.SinIn);
+
 				topCard.IsVisible = false;
 
 				if (_cardDistance > 0)
@@ -220,7 +228,9 @@ namespace SwipeCards
 
 					topCard.TranslateTo((-topCard.X), -topCard.Y, DefaultAnimationLength, Easing.SpringOut),
 					topCard.RotateTo(0, DefaultAnimationLength, Easing.SpringOut),
-					backCard.ScaleTo(_defaultSubcardScale, DefaultAnimationLength, Easing.SpringOut)
+					backCard.ScaleTo(_defaultSubcardScale, DefaultAnimationLength, Easing.SpringOut),
+					backCard.TranslateTo(_defaultSubcardTranslationX, 0, DefaultAnimationLength, Easing.SpringOut),
+					backCard.FadeTo(_defaultSubcardOpacity, DefaultAnimationLength, Easing.SpringOut)
 				);
 			}
 
@@ -234,7 +244,7 @@ namespace SwipeCards
 				return;
 
 			var topCard = CardStack.Children[NumberOfCards - 1];
-			var backCard = CardStack.Children[NumberOfCards - 2];
+			//var backCard = CardStack.Children[NumberOfCards - 2];
 
 			// Switch cards if this method has been called after a swipe and not at init
 			if (_itemIndex != 0)
@@ -246,13 +256,14 @@ namespace SwipeCards
 				CardStack.Children.Insert(0, topCard);
 			}
 
-			// Update cards from top to back  // Start with the first card on top which is the last one on the CardStack
+			// Update cards from top to back. Start with the first card on top which is the last one on the CardStack
 			for (var i = NumberOfCards - 1; i >= 0; i--)
 			{
 				var cardView = (CardView)CardStack.Children[i];
 
 				cardView.Rotation = 0;
-				cardView.TranslationX = 0;
+				cardView.TranslationX = _defaultSubcardTranslationX * (NumberOfCards - 1 - i);
+				cardView.Opacity = i == NumberOfCards - 1 ? 1 : _defaultSubcardOpacity;
 
 				// Check if an item for the card is available
 				var index = Math.Min((NumberOfCards - 1), ItemsSource.Count) - i + _itemIndex;
@@ -260,7 +271,13 @@ namespace SwipeCards
 				if (ItemsSource.Count > index)
 				{
 					cardView.Update(ItemsSource[index]);
-					cardView.IsVisible = true;
+
+					if (!cardView.IsVisible)
+					{
+						cardView.IsVisible = true;
+					}
+
+					//await cardView.TranslateTo(-_defaultSubcardTranslationX * i, 0, DefaultAnimationLength, Easing.SpringOut);
 				}
 			}
 		}
@@ -296,8 +313,13 @@ namespace SwipeCards
 
 				topCard.TranslateTo(direction == SwipeDirection.Right ? Width * 2 : -Width * 2, 0, animationLength, Easing.SinIn),
 				topCard.RotateTo(direction == SwipeDirection.Right ? 17.18873385f : -17.18873385f, animationLength, Easing.SinIn),
-				backCard.ScaleTo(1.0f, animationLength)
+				backCard.ScaleTo(1.0f, animationLength),
+				backCard.TranslateTo(0, 0, animationLength, Easing.SinIn),
+				backCard.FadeTo(1, animationLength, Easing.SinIn)
 			);
+
+			//var visual = new VisualElement();
+			//visual.FadeTo(1, animationLength, Easing.SinIn)
 
 			topCard.IsVisible = false;
 
