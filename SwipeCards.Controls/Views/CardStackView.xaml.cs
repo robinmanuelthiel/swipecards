@@ -79,6 +79,13 @@ namespace SwipeCards
 			panGesture.PanUpdated += OnPanUpdated;
 
 			CardStack.GestureRecognizers.Add(panGesture);
+
+			MessagingCenter.Subscribe<object>(this, "UP", async (arg) =>
+			{
+				Debug.WriteLine($"FakeCompleted: {_cardDistance}");
+
+				await HandleTouchCompleted();
+			});
 		}
 
 		public void Setup()
@@ -142,29 +149,62 @@ namespace SwipeCards
 			switch (e.StatusType)
 			{
 				case GestureStatus.Started:
+
 					HandleTouchStart();
+
+					Debug.WriteLine($"Started: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}");
 					break;
+
 				case GestureStatus.Running:
+
 					HandleTouchRunning((float)e.TotalX);
+
+					Debug.WriteLine($"Running: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}, -> _lastX: {_lastX}");
 					break;
+
 				case GestureStatus.Completed:
+
 					await HandleTouchCompleted();
+
+					Debug.WriteLine($"Completed: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}");
 					break;
+
 				case GestureStatus.Canceled:
 					break;
 			}
 		}
 
+		private bool _isDragging;
+		private double _lastX;
+		private const double DeltaX = 100;
+
 		private void HandleTouchStart()
 		{
-			if (_itemIndex < ItemsSource.Count)
-				StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], 0));
+			if (_itemIndex >= ItemsSource.Count)
+				return;
+
+			if (_cardDistance != 0)
+				return;
+
+			_lastX = 0;
+
+			_isDragging = true;
+
+			StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], 0));
 		}
 
 		private void HandleTouchRunning(float horizontalTraslation)
 		{
 			if (_itemIndex >= ItemsSource.Count)
 				return;
+
+			if (!_isDragging)
+				return;
+
+			if (horizontalTraslation - _lastX > DeltaX)
+				return;
+
+			_lastX = horizontalTraslation;
 
 			var topCard = CardStack.Children[NumberOfCards - 1];
 			var backCard = CardStack.Children[NumberOfCards - 2];
@@ -193,6 +233,9 @@ namespace SwipeCards
 		{
 			if (_itemIndex >= ItemsSource.Count)
 				return;
+
+			_lastX = 0;
+			_isDragging = false;
 
 			var topCard = CardStack.Children[NumberOfCards - 1];
 			var backCard = CardStack.Children[NumberOfCards - 2];
@@ -233,6 +276,8 @@ namespace SwipeCards
 					backCard.FadeTo(_defaultSubcardOpacity, DefaultAnimationLength, Easing.SpringOut)
 				);
 			}
+
+			_cardDistance = 0;
 
 			if (_itemIndex < ItemsSource.Count)
 				FinishedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
@@ -318,9 +363,6 @@ namespace SwipeCards
 				backCard.TranslateTo(0, 0, animationLength, Easing.SinIn),
 				backCard.FadeTo(1, animationLength, Easing.SinIn)
 			);
-
-			//var visual = new VisualElement();
-			//visual.FadeTo(1, animationLength, Easing.SinIn)
 
 			topCard.IsVisible = false;
 

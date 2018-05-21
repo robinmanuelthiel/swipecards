@@ -13,6 +13,7 @@
         <Title>SwipeCards for Xamarin.Forms</Title>
         <PackOnBuild>true</PackOnBuild>
         <PackageReleaseNotes>Add methods for programmatic swiping.</PackageReleaseNotes>
+        <TargetFramework>netstandard1.6</TargetFramework>
     </PropertyGroup>
     <!-- any extra properties for the .NET Standard build -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
