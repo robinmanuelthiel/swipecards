@@ -283,6 +283,33 @@ namespace SwipeCards
 				FinishedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
 		}
 
+		public async Task Swipe(SwipeDirection direction)
+		{
+			if (_itemIndex >= ItemsSource.Count)
+				return;
+
+			_lastX = 0;
+			_isDragging = false;
+
+			var topCard = CardStack.Children[NumberOfCards - 1];
+			var backCard = CardStack.Children[NumberOfCards - 2];
+
+			await Task.WhenAll(
+					topCard.TranslateTo(direction == SwipeDirection.Right ? Width * 2 : -Width * 2, 0, DefaultAnimationLength, Easing.SinIn),
+					backCard.ScaleTo(1, DefaultAnimationLength, Easing.SpringOut),
+					backCard.TranslateTo(0, 0, DefaultAnimationLength, Easing.SpringOut),
+					backCard.FadeTo(1, DefaultAnimationLength, Easing.SpringOut)
+				);
+
+			topCard.IsVisible = false;
+
+			_itemIndex++;
+
+			ShowNextCard();
+
+			_cardDistance = 0;
+		}
+
 		private void ShowNextCard()
 		{
 			if (ItemsSource == null || ItemsSource?.Count == 0)
