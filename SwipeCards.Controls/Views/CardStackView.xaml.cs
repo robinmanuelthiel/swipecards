@@ -9,12 +9,6 @@ using System.Diagnostics;
 
 namespace SwipeCards
 {
-	public enum SwipeMode
-	{
-		Tinder,
-		Carousel
-	}
-
 	public partial class CardStackView : ContentView
 	{
 		private static NotifyCollectionChangedEventHandler CollectionChangedEventHandler;
@@ -63,8 +57,6 @@ namespace SwipeCards
 			set { SetValue(SwipedLeftCommandProperty, value); }
 		}
 
-		public SwipeMode SwipeMode { get; set; } = SwipeMode.Tinder;
-
 		public event EventHandler<SwipedEventArgs> Swiped;
 		public event EventHandler<DraggingEventArgs> StartedDragging;
 		public event EventHandler<DraggingEventArgs> Dragging;
@@ -86,6 +78,20 @@ namespace SwipeCards
 
 				await HandleTouchCompleted();
 			});
+
+			/* put this in MainActivity for workaround to work -> https://github.com/xamarin/Xamarin.Forms/issues/1495
+
+                public override bool DispatchTouchEvent(MotionEvent ev)
+            {
+            if (ev.Action == MotionEventActions.Up)
+            {
+                MessagingCenter.Send<object>(this, "UP");
+            }
+
+            return base.DispatchTouchEvent(ev);
+        }
+
+            */
 		}
 
 		public void Setup()
@@ -139,7 +145,6 @@ namespace SwipeCards
 		{
 			base.OnSizeAllocated(width, height);
 
-			// Recalculate move distance. When not set differently, this distance is 1/3 of the control's width
 			if (CardMoveDistance == -1 && !width.Equals(-1))
 				CardMoveDistance = (int)(width / 3);
 		}
@@ -213,11 +218,8 @@ namespace SwipeCards
 			{
 				topCard.TranslationX = horizontalTraslation;
 
-				if (SwipeMode == SwipeMode.Tinder)
-				{
-					var rotationAngle = (float)(0.3f * Math.Min(horizontalTraslation / Width, 1.0f));
-					topCard.Rotation = rotationAngle * 57.2957795f;
-				}
+				var rotationAngle = (float)(0.3f * Math.Min(horizontalTraslation / Width, 1.0f));
+				topCard.Rotation = rotationAngle * 57.2957795f;
 
 				_cardDistance = horizontalTraslation;
 
@@ -316,19 +318,15 @@ namespace SwipeCards
 				return;
 
 			var topCard = CardStack.Children[NumberOfCards - 1];
-			//var backCard = CardStack.Children[NumberOfCards - 2];
 
-			// Switch cards if this method has been called after a swipe and not at init
 			if (_itemIndex != 0)
 			{
 				CardStack.Children.Remove(topCard);
 
-				// Scale swiped-away card (topcard) down and add it at the bottom of the stack
 				topCard.Scale = _defaultSubcardScale;
 				CardStack.Children.Insert(0, topCard);
 			}
 
-			// Update cards from top to back. Start with the first card on top which is the last one on the CardStack
 			for (var i = NumberOfCards - 1; i >= 0; i--)
 			{
 				var cardView = (CardView)CardStack.Children[i];
@@ -337,7 +335,6 @@ namespace SwipeCards
 				cardView.TranslationX = _defaultSubcardTranslationX * (NumberOfCards - 1 - i);
 				cardView.Opacity = i == NumberOfCards - 1 ? 1 : _defaultSubcardOpacity;
 
-				// Check if an item for the card is available
 				var index = Math.Min((NumberOfCards - 1), ItemsSource.Count) - i + _itemIndex;
 
 				if (ItemsSource.Count > index)
@@ -379,7 +376,6 @@ namespace SwipeCards
 					SwipedRightCommand.Execute(ItemsSource[_itemIndex]);
 			}
 
-			// Increase item index // Do that before the animation runs
 			_itemIndex++;
 
 			await Task.WhenAll(
