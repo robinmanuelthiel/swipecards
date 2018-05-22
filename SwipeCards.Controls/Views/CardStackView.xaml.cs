@@ -231,7 +231,7 @@ namespace SwipeCards
 
 		private async Task HandleTouchCompleted()
 		{
-			if (_itemIndex >= ItemsSource.Count)
+			if (_itemIndex >= ItemsSource.Count || !_isDragging)
 				return;
 
 			_lastX = 0;
