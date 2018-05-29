@@ -9,77 +9,77 @@ using System.Diagnostics;
 
 namespace SwipeCards
 {
-	public partial class CardStackView : ContentView
-	{
-		private static NotifyCollectionChangedEventHandler CollectionChangedEventHandler;
+    public partial class CardStackView : ContentView
+    {
+        private static NotifyCollectionChangedEventHandler CollectionChangedEventHandler;
 
-		private const int NumberOfCards = 2;
-		private const int DefaultAnimationLength = 250;
-		private float _defaultSubcardScale = 0.9f;
-		private float _defaultSubcardTranslationX = -30;
-		private float _defaultSubcardOpacity = .6f;
-		private float _cardDistance;
-		private int _itemIndex;
+        private const int NumberOfCards = 2;
+        private const int DefaultAnimationLength = 250;
+        private float _defaultSubcardScale = 0.9f;
+        private float _defaultSubcardTranslationX = -30;
+        private float _defaultSubcardOpacity = .6f;
+        private float _cardDistance;
+        private int _itemIndex;
 
-		public static BindableProperty SwipedRightCommandProperty = BindableProperty.Create(nameof(SwipedRightCommand), typeof(ICommand), typeof(CardStackView), null);
-		public static BindableProperty SwipedLeftCommandProperty = BindableProperty.Create(nameof(SwipedLeftCommand), typeof(ICommand), typeof(CardStackView), null);
-		public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(CardStackView), null, BindingMode.TwoWay, propertyChanged: OnItemsSourcePropertyChanged);
-		public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), -1);
-		public static readonly BindableProperty ItemTemplateProperty = BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(CardStackView));
+        public static BindableProperty SwipedRightCommandProperty = BindableProperty.Create(nameof(SwipedRightCommand), typeof(ICommand), typeof(CardStackView), null);
+        public static BindableProperty SwipedLeftCommandProperty = BindableProperty.Create(nameof(SwipedLeftCommand), typeof(ICommand), typeof(CardStackView), null);
+        public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IList), typeof(CardStackView), null, BindingMode.TwoWay, propertyChanged: OnItemsSourcePropertyChanged);
+        public static readonly BindableProperty CardMoveDistanceProperty = BindableProperty.Create(nameof(CardMoveDistance), typeof(int), typeof(CardStackView), -1);
+        public static readonly BindableProperty ItemTemplateProperty = BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(CardStackView));
 
-		public IList ItemsSource
-		{
-			get { return (IList)GetValue(ItemsSourceProperty); }
-			set { SetValue(ItemsSourceProperty, value); }
-		}
+        public IList ItemsSource
+        {
+            get { return (IList)GetValue(ItemsSourceProperty); }
+            set { SetValue(ItemsSourceProperty, value); }
+        }
 
-		public DataTemplate ItemTemplate
-		{
-			get { return (DataTemplate)GetValue(ItemTemplateProperty); }
-			set { SetValue(ItemTemplateProperty, value); }
-		}
+        public DataTemplate ItemTemplate
+        {
+            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
+            set { SetValue(ItemTemplateProperty, value); }
+        }
 
-		public int CardMoveDistance
-		{
-			get { return (int)GetValue(CardMoveDistanceProperty); }
-			set { SetValue(CardMoveDistanceProperty, value); }
-		}
+        public int CardMoveDistance
+        {
+            get { return (int)GetValue(CardMoveDistanceProperty); }
+            set { SetValue(CardMoveDistanceProperty, value); }
+        }
 
-		public ICommand SwipedRightCommand
-		{
-			get { return (ICommand)GetValue(SwipedRightCommandProperty); }
-			set { SetValue(SwipedRightCommandProperty, value); }
-		}
+        public ICommand SwipedRightCommand
+        {
+            get { return (ICommand)GetValue(SwipedRightCommandProperty); }
+            set { SetValue(SwipedRightCommandProperty, value); }
+        }
 
-		public ICommand SwipedLeftCommand
-		{
-			get { return (ICommand)GetValue(SwipedLeftCommandProperty); }
-			set { SetValue(SwipedLeftCommandProperty, value); }
-		}
+        public ICommand SwipedLeftCommand
+        {
+            get { return (ICommand)GetValue(SwipedLeftCommandProperty); }
+            set { SetValue(SwipedLeftCommandProperty, value); }
+        }
 
-		public event EventHandler<SwipedEventArgs> Swiped;
-		public event EventHandler<DraggingEventArgs> StartedDragging;
-		public event EventHandler<DraggingEventArgs> Dragging;
-		public event EventHandler<DraggingEventArgs> FinishedDragging;
-		public event EventHandler<EventArgs> NoMoreCards;
+        public event EventHandler<SwipedEventArgs> Swiped;
+        public event EventHandler<DraggingEventArgs> StartedDragging;
+        public event EventHandler<DraggingEventArgs> Dragging;
+        public event EventHandler<DraggingEventArgs> FinishedDragging;
+        public event EventHandler<EventArgs> NoMoreCards;
 
-		public CardStackView()
-		{
-			InitializeComponent();
+        public CardStackView()
+        {
+            InitializeComponent();
 
-			var panGesture = new PanGestureRecognizer();
-			panGesture.PanUpdated += OnPanUpdated;
+            var panGesture = new PanGestureRecognizer();
+            panGesture.PanUpdated += OnPanUpdated;
 
-			CardStack.GestureRecognizers.Add(panGesture);
+            CardStack.GestureRecognizers.Add(panGesture);
 
-			MessagingCenter.Subscribe<object>(this, "UP", async (arg) =>
-			{
-				Debug.WriteLine($"FakeCompleted: {_cardDistance}");
+            MessagingCenter.Subscribe<object>(this, "UP", async (arg) =>
+            {
+                Debug.WriteLine($"FakeCompleted: {_cardDistance}");
 
-				await HandleTouchCompleted();
-			});
+                await HandleTouchCompleted();
+            });
 
-			/* put this in MainActivity for workaround to work -> https://github.com/xamarin/Xamarin.Forms/issues/1495
+            /* put this in MainActivity for workaround to work -> https://github.com/xamarin/Xamarin.Forms/issues/1495
 
                 public override bool DispatchTouchEvent(MotionEvent ev)
             {
@@ -92,304 +92,265 @@ namespace SwipeCards
         }
 
             */
-		}
+        }
 
-		public void Setup()
-		{
-			CardStack.Children.Clear();
+        public void Setup()
+        {
+            CardStack.Children.Clear();
 
-			if (ItemsSource != null && ItemsSource.Count == 0)
-				return;
+            if (ItemsSource != null && ItemsSource.Count == 0)
+                return;
 
-			for (var i = NumberOfCards - 1; i >= 0; i--)
-			{
-				var cardView = new CardView(ItemTemplate)
-				{
-					IsVisible = false,
-					Scale = (i == 0) ? 1 : _defaultSubcardScale,
-					TranslationX = (i == 0) ? 0 : _defaultSubcardTranslationX,
-					Opacity = (i == 0) ? 0 : _defaultSubcardOpacity
-				};
+            for (var i = NumberOfCards - 1; i >= 0; i--)
+            {
+                var cardView = new CardView(ItemTemplate)
+                {
+                    IsVisible = false,
+                    Scale = (i == 0) ? 1 : _defaultSubcardScale,
+                    TranslationX = (i == 0) ? 0 : _defaultSubcardTranslationX,
+                    Opacity = (i == 0) ? 0 : _defaultSubcardOpacity
+                };
 
-				CardStack.Children.Add(cardView, Constraint.Constant(0), Constraint.Constant(0), Constraint.RelativeToParent((parent) => { return parent.Width; }),
-																								 Constraint.RelativeToParent((parent) => { return parent.Height; })
-				);
-			}
+                CardStack.Children.Add(cardView, Constraint.Constant(0), Constraint.Constant(0), Constraint.RelativeToParent((parent) => { return parent.Width; }),
+                                                                                                 Constraint.RelativeToParent((parent) => { return parent.Height; })
+                );
+            }
 
-			_itemIndex = 0;
+            _itemIndex = 0;
 
-			ShowNextCard();
-		}
+            ShowNextCard();
+        }
 
-		private static void OnItemsSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
-		{
-			if (newValue is INotifyCollectionChanged)
-			{
-				if (CollectionChangedEventHandler != null)
-					((INotifyCollectionChanged)newValue).CollectionChanged -= CollectionChangedEventHandler;
+        private static void OnItemsSourcePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (newValue is INotifyCollectionChanged)
+            {
+                if (CollectionChangedEventHandler != null)
+                    ((INotifyCollectionChanged)newValue).CollectionChanged -= CollectionChangedEventHandler;
 
-				CollectionChangedEventHandler = (sender, e) => ItemsSource_CollectionChanged(sender, e, (CardStackView)bindable);
+                CollectionChangedEventHandler = (sender, e) => ItemsSource_CollectionChanged(sender, e, (CardStackView)bindable);
 
-				((INotifyCollectionChanged)newValue).CollectionChanged += CollectionChangedEventHandler;
-			}
+                ((INotifyCollectionChanged)newValue).CollectionChanged += CollectionChangedEventHandler;
+            }
 
-			((CardStackView)bindable).Setup();
-		}
+            ((CardStackView)bindable).Setup();
+        }
 
-		private static void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e, CardStackView cardStackView)
-		{
-			cardStackView.Setup();
-		}
+        private static void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e, CardStackView cardStackView)
+        {
+            cardStackView.Setup();
+        }
 
-		protected override void OnSizeAllocated(double width, double height)
-		{
-			base.OnSizeAllocated(width, height);
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
 
-			if (CardMoveDistance == -1 && !width.Equals(-1))
-				CardMoveDistance = (int)(width / 3);
-		}
+            if (CardMoveDistance == -1 && !width.Equals(-1))
+                CardMoveDistance = (int)(width / 3);
+        }
 
-		private async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
-		{
-			switch (e.StatusType)
-			{
-				case GestureStatus.Started:
+        private async void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+        {
+            switch (e.StatusType)
+            {
+                case GestureStatus.Started:
 
-					HandleTouchStart();
+                    HandleTouchStart();
 
-					Debug.WriteLine($"Started: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}");
-					break;
+                    Debug.WriteLine($"Started: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}");
+                    break;
 
-				case GestureStatus.Running:
+                case GestureStatus.Running:
 
-					HandleTouchRunning((float)e.TotalX);
+                    HandleTouchRunning((float)e.TotalX);
 
-					Debug.WriteLine($"Running: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}, -> _lastX: {_lastX}");
-					break;
+                    Debug.WriteLine($"Running: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}, -> _lastX: {_lastX}");
+                    break;
 
-				case GestureStatus.Completed:
+                case GestureStatus.Completed:
 
-					await HandleTouchCompleted();
+                    await HandleTouchCompleted();
 
-					Debug.WriteLine($"Completed: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}");
-					break;
+                    Debug.WriteLine($"Completed: {_cardDistance}, x:{e.TotalX} y:{e.TotalY}");
+                    break;
 
-				case GestureStatus.Canceled:
-					break;
-			}
-		}
+                case GestureStatus.Canceled:
+                    break;
+            }
+        }
 
-		private bool _isDragging;
-		private double _lastX;
-		private const double DeltaX = 100;
+        private bool _isDragging;
+        private double _lastX;
+        private const double DeltaX = 100;
 
-		private void HandleTouchStart()
-		{
-			if (_itemIndex >= ItemsSource.Count)
-				return;
+        private void HandleTouchStart()
+        {
+            if (_itemIndex >= ItemsSource.Count)
+                return;
 
-			if (_cardDistance != 0)
-				return;
+            if (_cardDistance != 0)
+                return;
 
-			_lastX = 0;
+            _lastX = 0;
 
-			_isDragging = true;
+            _isDragging = true;
 
-			StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], 0));
-		}
+            StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], 0));
+        }
 
-		private void HandleTouchRunning(float horizontalTraslation)
-		{
-			if (_itemIndex >= ItemsSource.Count)
-				return;
+        private void HandleTouchRunning(float horizontalTraslation)
+        {
+            if (_itemIndex >= ItemsSource.Count)
+                return;
 
-			if (!_isDragging)
-				return;
+            if (!_isDragging)
+                return;
 
-			if (horizontalTraslation - _lastX > DeltaX)
-				return;
+            if (Math.Abs(horizontalTraslation - _lastX) > DeltaX)
+                return;
 
-			_lastX = horizontalTraslation;
+            _lastX = horizontalTraslation;
 
-			var topCard = CardStack.Children[NumberOfCards - 1];
-			var backCard = CardStack.Children[NumberOfCards - 2];
+            var topCard = CardStack.Children[NumberOfCards - 1];
+            var backCard = CardStack.Children[NumberOfCards - 2];
 
-			if (topCard.IsVisible)
-			{
-				topCard.TranslationX = horizontalTraslation;
+            if (topCard.IsVisible)
+            {
+                topCard.TranslationX = horizontalTraslation;
 
-				var rotationAngle = (float)(0.3f * Math.Min(horizontalTraslation / Width, 1.0f));
-				topCard.Rotation = rotationAngle * 57.2957795f;
+                var rotationAngle = (float)(0.3f * Math.Min(horizontalTraslation / Width, 1.0f));
+                topCard.Rotation = rotationAngle * 57.2957795f;
 
-				_cardDistance = horizontalTraslation;
+                _cardDistance = horizontalTraslation;
 
-				Dragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
-			}
+                Dragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
+            }
 
-			backCard.Scale = Math.Min(_defaultSubcardScale + Math.Abs((_cardDistance / CardMoveDistance) * (1 - _defaultSubcardScale)), 1);
-			backCard.TranslationX = Math.Min(_defaultSubcardTranslationX + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardTranslationX), 0);
-			backCard.Opacity = Math.Min(_defaultSubcardOpacity + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardOpacity), 1);
-		}
+            backCard.Scale = Math.Min(_defaultSubcardScale + Math.Abs((_cardDistance / CardMoveDistance) * (1 - _defaultSubcardScale)), 1);
+            backCard.TranslationX = Math.Min(_defaultSubcardTranslationX + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardTranslationX), 0);
+            backCard.Opacity = Math.Min(_defaultSubcardOpacity + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardOpacity), 1);
+        }
 
-		private async Task HandleTouchCompleted()
-		{
-			if (_itemIndex >= ItemsSource.Count || !_isDragging)
-				return;
+        private async Task HandleTouchCompleted()
+        {
+            if (_itemIndex >= ItemsSource.Count || !_isDragging)
+                return;
 
-			_lastX = 0;
-			_isDragging = false;
+            _lastX = 0;
+            _isDragging = false;
 
-			var topCard = CardStack.Children[NumberOfCards - 1];
-			var backCard = CardStack.Children[NumberOfCards - 2];
+            var topCard = CardStack.Children[NumberOfCards - 1];
+            var backCard = CardStack.Children[NumberOfCards - 2];
 
-			if (Math.Abs(_cardDistance) >= CardMoveDistance)
-			{
-				await topCard.TranslateTo(_cardDistance > 0 ? Width * 2 : -Width * 2, 0, DefaultAnimationLength, Easing.SinIn);
+            if (Math.Abs(_cardDistance) >= CardMoveDistance)
+            {
+                await topCard.TranslateTo(_cardDistance > 0 ? Width * 2 : -Width * 2, 0, DefaultAnimationLength, Easing.SinIn);
 
-				topCard.IsVisible = false;
+                topCard.IsVisible = false;
 
-				if (_cardDistance > 0)
-				{
-					Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[_itemIndex], SwipeDirection.Right));
+                if (_cardDistance > 0)
+                {
+                    Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[_itemIndex], SwipeDirection.Right));
 
-					if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[_itemIndex]))
-						SwipedRightCommand.Execute(ItemsSource[_itemIndex]);
-				}
-				else
-				{
-					Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[_itemIndex], SwipeDirection.Left));
+                    if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[_itemIndex]))
+                        SwipedRightCommand.Execute(ItemsSource[_itemIndex]);
+                }
+                else
+                {
+                    Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[_itemIndex], SwipeDirection.Left));
 
-					if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[_itemIndex]))
-						SwipedLeftCommand.Execute(ItemsSource[_itemIndex]);
-				}
+                    if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[_itemIndex]))
+                        SwipedLeftCommand.Execute(ItemsSource[_itemIndex]);
+                }
 
-				_itemIndex++;
 
-				ShowNextCard();
-			}
-			else
-			{
-				await Task.WhenAll(
+                _itemIndex++;
 
-					topCard.TranslateTo((-topCard.X), -topCard.Y, DefaultAnimationLength, Easing.SpringOut),
-					topCard.RotateTo(0, DefaultAnimationLength, Easing.SpringOut),
-					backCard.ScaleTo(_defaultSubcardScale, DefaultAnimationLength, Easing.SpringOut),
-					backCard.TranslateTo(_defaultSubcardTranslationX, 0, DefaultAnimationLength, Easing.SpringOut),
-					backCard.FadeTo(_defaultSubcardOpacity, DefaultAnimationLength, Easing.SpringOut)
-				);
-			}
+                ShowNextCard();
+            }
+            else
+            {
+                await Task.WhenAll(
 
-			_cardDistance = 0;
+                    topCard.TranslateTo((-topCard.X), -topCard.Y, DefaultAnimationLength, Easing.SpringOut),
+                    topCard.RotateTo(0, DefaultAnimationLength, Easing.SpringOut),
+                    backCard.ScaleTo(_defaultSubcardScale, DefaultAnimationLength, Easing.SpringOut),
+                    backCard.TranslateTo(_defaultSubcardTranslationX, 0, DefaultAnimationLength, Easing.SpringOut),
+                    backCard.FadeTo(_defaultSubcardOpacity, DefaultAnimationLength, Easing.SpringOut)
+                );
+            }
 
-			if (_itemIndex < ItemsSource.Count)
-				FinishedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
-		}
+            _cardDistance = 0;
 
-		public async Task Swipe(SwipeDirection direction)
-		{
-			if (_itemIndex >= ItemsSource.Count)
-				return;
+            if (_itemIndex < ItemsSource.Count)
+                FinishedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], _cardDistance));
+        }
 
-			_lastX = 0;
-			_isDragging = false;
+        public async Task Swipe(SwipeDirection direction)
+        {
+            if (_itemIndex >= ItemsSource.Count)
+                return;
 
-			var topCard = CardStack.Children[NumberOfCards - 1];
-			var backCard = CardStack.Children[NumberOfCards - 2];
+            _lastX = 0;
+            _isDragging = false;
 
-			await Task.WhenAll(
-					topCard.TranslateTo(direction == SwipeDirection.Right ? Width * 2 : -Width * 2, 0, DefaultAnimationLength, Easing.SinIn),
-					backCard.ScaleTo(1, DefaultAnimationLength, Easing.SpringOut),
-					backCard.TranslateTo(0, 0, DefaultAnimationLength, Easing.SpringOut),
-					backCard.FadeTo(1, DefaultAnimationLength, Easing.SpringOut)
-				);
+            var topCard = CardStack.Children[NumberOfCards - 1];
+            var backCard = CardStack.Children[NumberOfCards - 2];
 
-			topCard.IsVisible = false;
+            await Task.WhenAll(
+                    topCard.TranslateTo(direction == SwipeDirection.Right ? Width * 2 : -Width * 2, 0, DefaultAnimationLength, Easing.SinIn),
+                    backCard.ScaleTo(1, DefaultAnimationLength, Easing.SpringOut),
+                    backCard.TranslateTo(0, 0, DefaultAnimationLength, Easing.SpringOut),
+                    backCard.FadeTo(1, DefaultAnimationLength, Easing.SpringOut)
+                );
 
-			_itemIndex++;
+            topCard.IsVisible = false;
 
-			ShowNextCard();
+            _itemIndex++;
 
-			_cardDistance = 0;
-		}
+            ShowNextCard();
 
-		private void ShowNextCard()
-		{
-			if (ItemsSource == null || ItemsSource?.Count == 0)
-				return;
+            _cardDistance = 0;
+        }
 
-			var topCard = CardStack.Children[NumberOfCards - 1];
+        private void ShowNextCard()
+        {
+            if (ItemsSource == null || ItemsSource?.Count == 0)
+                return;
 
-			if (_itemIndex != 0)
-			{
-				CardStack.Children.Remove(topCard);
+            var topCard = CardStack.Children[NumberOfCards - 1];
 
-				topCard.Scale = _defaultSubcardScale;
-				CardStack.Children.Insert(0, topCard);
-			}
+            if (_itemIndex != 0)
+            {
+                CardStack.Children.Remove(topCard);
 
-			for (var i = NumberOfCards - 1; i >= 0; i--)
-			{
-				var cardView = (CardView)CardStack.Children[i];
+                topCard.Scale = _defaultSubcardScale;
+                CardStack.Children.Insert(0, topCard);
+            }
 
-				cardView.Rotation = 0;
-				cardView.TranslationX = _defaultSubcardTranslationX * (NumberOfCards - 1 - i);
-				cardView.Opacity = i == NumberOfCards - 1 ? 1 : _defaultSubcardOpacity;
+            for (var i = NumberOfCards - 1; i >= 0; i--)
+            {
+                var cardView = (CardView)CardStack.Children[i];
 
-				var index = Math.Min((NumberOfCards - 1), ItemsSource.Count) - i + _itemIndex;
+                cardView.Rotation = 0;
+                cardView.TranslationX = _defaultSubcardTranslationX * (NumberOfCards - 1 - i);
+                cardView.Opacity = i == NumberOfCards - 1 ? 1 : _defaultSubcardOpacity;
 
-				if (ItemsSource.Count > index)
-				{
-					cardView.Update(ItemsSource[index]);
+                var index = Math.Min((NumberOfCards - 1), ItemsSource.Count) - i + _itemIndex;
 
-					if (!cardView.IsVisible)
-					{
-						cardView.TranslationX = -cardView.Width + _defaultSubcardTranslationX;
-						cardView.IsVisible = true;
+                if (ItemsSource.Count > index)
+                {
+                    cardView.Update(ItemsSource[index]);
 
-						cardView.TranslateTo(_defaultSubcardTranslationX * (NumberOfCards - 1 - i), 0, DefaultAnimationLength, Easing.Linear);
-					}
-				}
-			}
-		}
+                    if (!cardView.IsVisible)
+                    {
+                        cardView.TranslationX = -cardView.Width + _defaultSubcardTranslationX;
+                        cardView.IsVisible = true;
 
-		public async Task Swipe(SwipeDirection direction, uint animationLength = DefaultAnimationLength)
-		{
-			if (_itemIndex >= ItemsSource?.Count)
-			{
-				NoMoreCards?.Invoke(this, new EventArgs());
-				return;
-			}
-
-			var topCard = CardStack.Children[NumberOfCards - 1];
-			var backCard = CardStack.Children[NumberOfCards - 2];
-
-			Swiped?.Invoke(this, new SwipedEventArgs(ItemsSource[_itemIndex], direction));
-
-			if (direction == SwipeDirection.Left)
-			{
-				if (SwipedLeftCommand != null && SwipedLeftCommand.CanExecute(ItemsSource[_itemIndex]))
-					SwipedLeftCommand.Execute(ItemsSource[_itemIndex]);
-			}
-			else if (direction == SwipeDirection.Right)
-			{
-				if (SwipedRightCommand != null && SwipedRightCommand.CanExecute(ItemsSource[_itemIndex]))
-					SwipedRightCommand.Execute(ItemsSource[_itemIndex]);
-			}
-
-			_itemIndex++;
-
-			await Task.WhenAll(
-
-				topCard.TranslateTo(direction == SwipeDirection.Right ? Width * 2 : -Width * 2, 0, animationLength, Easing.SinIn),
-				topCard.RotateTo(direction == SwipeDirection.Right ? 17.18873385f : -17.18873385f, animationLength, Easing.SinIn),
-				backCard.ScaleTo(1.0f, animationLength),
-				backCard.TranslateTo(0, 0, animationLength, Easing.SinIn),
-				backCard.FadeTo(1, animationLength, Easing.SinIn)
-			);
-
-			topCard.IsVisible = false;
-
-			ShowNextCard();
-		}
-	}
+                        cardView.TranslateTo(_defaultSubcardTranslationX * (NumberOfCards - 1 - i), 0, DefaultAnimationLength, Easing.Linear);
+                    }
+                }
+            }
+        }
+    }
 }

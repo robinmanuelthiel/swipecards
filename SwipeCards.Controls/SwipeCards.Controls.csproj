@@ -33,6 +33,9 @@
         <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
         <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <DebugType></DebugType>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2" />
         <PackageReference Include="MSBuild.Sdk.Extras" Version="1.5.4" />
