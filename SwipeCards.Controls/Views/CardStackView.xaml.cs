@@ -67,17 +67,19 @@ namespace SwipeCards
         {
             InitializeComponent();
 
-            var panGesture = new PanGestureRecognizer();
-            panGesture.PanUpdated += OnPanUpdated;
-
-            CardStack.GestureRecognizers.Add(panGesture);
-
-            MessagingCenter.Subscribe<object>(this, "UP", async (arg) =>
+            if (Device.RuntimePlatform == Device.iOS)
             {
-                Debug.WriteLine($"FakeCompleted: {_cardDistance}");
+                var panGesture = new PanGestureRecognizer();
+                panGesture.PanUpdated += OnPanUpdated;
+                CardStack.GestureRecognizers.Add(panGesture);
+            }
 
-                await HandleTouchCompleted();
-            });
+            //MessagingCenter.Subscribe<object>(this, "UP", async (arg) =>
+            //{
+            //    Debug.WriteLine($"FakeCompleted: {_cardDistance}");
+            //
+            //    await HandleTouchCompleted();
+            //});
 
             /* put this in MainActivity for workaround to work -> https://github.com/xamarin/Xamarin.Forms/issues/1495
 
@@ -183,7 +185,7 @@ namespace SwipeCards
         private double _lastX;
         private const double DeltaX = 100;
 
-        private void HandleTouchStart()
+        public void HandleTouchStart()
         {
             if (_itemIndex >= ItemsSource.Count)
                 return;
@@ -198,7 +200,7 @@ namespace SwipeCards
             StartedDragging?.Invoke(this, new DraggingEventArgs(ItemsSource[_itemIndex], 0));
         }
 
-        private void HandleTouchRunning(float horizontalTraslation)
+        public void HandleTouchRunning(float horizontalTraslation)
         {
             if (_itemIndex >= ItemsSource.Count)
                 return;
@@ -231,8 +233,11 @@ namespace SwipeCards
             backCard.Opacity = Math.Min(_defaultSubcardOpacity + Math.Abs((_cardDistance / CardMoveDistance) * _defaultSubcardOpacity), 1);
         }
 
-        private async Task HandleTouchCompleted()
+        public async Task HandleTouchCompleted()
         {
+            if (_itemIndex >= ItemsSource.Count - 1)
+                NoMoreCards?.Invoke(this, new EventArgs());
+
             if (_itemIndex >= ItemsSource.Count || !_isDragging)
                 return;
 
