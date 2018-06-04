@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using Xamarin.Forms;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Xamarin.Forms;
 
-namespace SwipeCards.Controls
+namespace SwipeCards
 {
-    public partial class CardView : ContentView
-    {
-        public CardView(DataTemplate itemTemplate)
-        {
-            InitializeComponent();
-            Container.Content = itemTemplate.CreateContent() as View;
-        }
+	public partial class CardView : ContentView
+	{
+		public CardView(DataTemplate itemTemplate)
+		{
+			InitializeComponent();
 
-        public void Update(object item)
-        {
-            //Container.IsVisible = false;
-            Container.Content.BindingContext = item;
-            //Container.IsVisible = true;
-        }
-    }
+			Container.Content = itemTemplate.CreateContent() as View;
+		}
+
+		public void Update(object item)
+		{
+			Container.Content.BindingContext = item;
+		}
+	}
 }

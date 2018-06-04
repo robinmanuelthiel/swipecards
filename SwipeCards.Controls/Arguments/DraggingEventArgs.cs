@@ -1,14 +1,16 @@
 ﻿using System;
 
-namespace SwipeCards.Controls.Arguments
+namespace SwipeCards
 {
-    public class DraggingEventArgs : EventArgs
-    {
-        public readonly object Item;
+	public class DraggingEventArgs : EventArgs
+	{
+		public object Item { get; private set; }
+		public double Distance { get; private set; }
 
-        public DraggingEventArgs(object item)
-        {
-            this.Item = item;
-        }
-    }
+		public DraggingEventArgs(object item, double distance)
+		{
+			Item = item;
+			Distance = distance;
+		}
+	}
 }

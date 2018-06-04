@@ -1,21 +1,22 @@
 ﻿using System;
 
-namespace SwipeCards.Controls.Arguments
+namespace SwipeCards
 {
-    public class SwipedEventArgs : EventArgs
-    {
-        public readonly object Item;
-        public readonly SwipeDirection Direction;
+	public class SwipedEventArgs : EventArgs
+	{
+		public object Item { get; private set; }
+		public SwipeDirection Direction { get; private set; }
 
-        public SwipedEventArgs(object item, SwipeDirection direction)
-        {
-            this.Item = item;
-            this.Direction = direction;
-        }
-    }
+		public SwipedEventArgs(object item, SwipeDirection direction)
+		{
+			Item = item;
+			Direction = direction;
+		}
+	}
 
-    public enum SwipeDirection
-    {
-        Left, Right
-    }
+	public enum SwipeDirection
+	{
+		Left,
+		Right
+	}
 }
